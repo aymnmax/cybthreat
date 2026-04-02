@@ -8,864 +8,369 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&family=Syne:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
   <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{--bg:#0a0c10;--bg2:#0d1018;--bg3:#141720;--surface:#161b24;--surface2:#1c2230;--border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.12);--text:#e8eaf0;--text2:#8b93a8;--text3:#555d72;--accent:#00e5a0;--accent2:#00ffb3;--accent-dim:rgba(0,229,160,0.1);--red:#ff4d4d;--red-bg:rgba(255,77,77,0.1);--amber:#ffb547;--amber-bg:rgba(255,181,71,0.1);--blue:#4d9eff;--blue-bg:rgba(77,158,255,0.1);--purple:#a78bfa;--font:'Syne',sans-serif;--mono:'JetBrains Mono',monospace;--r:10px;--rl:16px}
+    html{scroll-behavior:smooth}
+    body{background:var(--bg);color:var(--text);font-family:var(--font);line-height:1.6;min-height:100vh;overflow-x:hidden}
+    .scanline{position:fixed;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.025) 2px,rgba(0,0,0,0.025) 4px);pointer-events:none;z-index:1000}
 
-    :root {
-      --bg:        #0a0c10;
-      --bg2:       #0d1018;
-      --bg3:       #141720;
-      --surface:   #161b24;
-      --surface2:  #1c2230;
-      --border:    rgba(255,255,255,0.07);
-      --border2:   rgba(255,255,255,0.12);
-      --text:      #e8eaf0;
-      --text2:     #8b93a8;
-      --text3:     #555d72;
-      --accent:    #00e5a0;
-      --accent2:   #00ffb3;
-      --accent-dim:rgba(0,229,160,0.1);
-      --red:       #ff4d4d;
-      --red-bg:    rgba(255,77,77,0.1);
-      --amber:     #ffb547;
-      --amber-bg:  rgba(255,181,71,0.1);
-      --blue:      #4d9eff;
-      --blue-bg:   rgba(77,158,255,0.1);
-      --purple:    #a78bfa;
-      --font:      'Syne', sans-serif;
-      --mono:      'JetBrains Mono', monospace;
-      --r:         10px;
-      --rl:        16px;
-    }
+    /* NAV */
+    .nav{position:sticky;top:0;z-index:200;background:rgba(10,12,16,0.92);backdrop-filter:blur(14px);border-bottom:1px solid var(--border)}
+    .nav-inner{max-width:1260px;margin:0 auto;padding:0 24px;height:64px;display:flex;align-items:center;justify-content:space-between;gap:16px}
+    .logo{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--text);flex-shrink:0}
+    .logo-shield{color:var(--accent);display:flex}
+    .logo-name{font-size:20px;font-weight:900;letter-spacing:-0.03em}
+    .nav-links{display:flex;align-items:center;gap:2px}
+    .nav-a{font-size:13px;font-weight:600;color:var(--text2);text-decoration:none;padding:7px 12px;border-radius:7px;transition:all .2s;display:flex;align-items:center;gap:6px;white-space:nowrap}
+    .nav-a:hover{color:var(--text);background:var(--surface)}
+    .nav-cta{background:var(--accent);color:#001a0e !important;font-weight:700;padding:7px 16px;margin-left:6px;transition:background .2s}
+    .nav-cta:hover{background:var(--accent2) !important}
+    .nav-job{border:1px solid rgba(255,181,71,.35);color:var(--amber) !important;background:rgba(255,181,71,.07)}
+    .nav-job:hover{background:rgba(255,181,71,.14) !important}
+    .hamburger{display:none;flex-direction:column;gap:5px;background:none;border:none;cursor:pointer;padding:8px;z-index:201}
+    .hamburger span{display:block;width:22px;height:2px;background:var(--text);border-radius:2px;transition:all .3s}
+    .hamburger.open span:nth-child(1){transform:translateY(7px) rotate(45deg)}
+    .hamburger.open span:nth-child(2){opacity:0}
+    .hamburger.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg)}
+    .mobile-menu{display:none;position:fixed;inset:64px 0 0 0;background:rgba(10,12,16,.98);backdrop-filter:blur(14px);z-index:199;flex-direction:column;padding:24px;gap:8px;border-top:1px solid var(--border);overflow-y:auto}
+    .mobile-menu.open{display:flex}
+    .mobile-menu .nav-a{font-size:16px;padding:13px 16px;border-radius:10px}
+    .mobile-menu .nav-cta{margin-left:0;justify-content:center;font-size:15px}
+    .mobile-menu .nav-job{margin-left:0}
 
-    html { scroll-behavior: smooth; }
-    body {
-      background: var(--bg);
-      color: var(--text);
-      font-family: var(--font);
-      line-height: 1.6;
-      min-height: 100vh;
-      overflow-x: hidden;
-    }
+    /* HERO */
+    .hero{position:relative;overflow:hidden;min-height:100vh;display:flex;align-items:center}
+    .hero-bg{position:absolute;inset:0;background:radial-gradient(ellipse 60% 60% at 30% 50%,rgba(0,229,160,.055) 0%,transparent 70%),radial-gradient(ellipse 50% 40% at 80% 80%,rgba(77,158,255,.04) 0%,transparent 60%)}
+    .hero-grid{position:absolute;inset:0;background-image:linear-gradient(var(--border) 1px,transparent 1px),linear-gradient(90deg,var(--border) 1px,transparent 1px);background-size:44px 44px;mask-image:radial-gradient(ellipse 100% 100% at 50% 50%,black 10%,transparent 80%)}
+    .hero-inner{position:relative;z-index:2;max-width:1260px;margin:0 auto;padding:100px 24px 100px;display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:center}
+    .hero-tag{display:inline-flex;align-items:center;gap:8px;font-family:var(--mono);font-size:11px;color:var(--accent);background:var(--accent-dim);border:1px solid rgba(0,229,160,.2);padding:5px 14px;border-radius:20px;margin-bottom:22px;letter-spacing:.04em;width:fit-content}
+    .blink{width:6px;height:6px;background:var(--accent);border-radius:50%;animation:blink 1.5s infinite;flex-shrink:0}
+    @keyframes blink{0%,100%{opacity:1}50%{opacity:.15}}
+    .hero-h1{font-size:clamp(36px,5.5vw,68px);font-weight:900;line-height:1.0;letter-spacing:-.05em;margin-bottom:22px}
+    .hero-h1 .line2{color:var(--accent)}
+    .hero-p{font-size:14px;color:var(--text2);line-height:1.75;max-width:500px;margin-bottom:10px}
+    .hero-btns{display:flex;gap:10px;flex-wrap:wrap;margin-top:28px}
+    .btn-primary{display:inline-flex;align-items:center;gap:8px;background:var(--accent);color:#001a0e;font-family:var(--font);font-size:14px;font-weight:700;padding:11px 22px;border-radius:9px;border:none;cursor:pointer;text-decoration:none;transition:all .2s}
+    .btn-primary:hover{background:var(--accent2);transform:translateY(-1px)}
+    .btn-outline{display:inline-flex;align-items:center;gap:8px;background:transparent;color:var(--text);font-family:var(--font);font-size:14px;font-weight:600;padding:11px 22px;border-radius:9px;border:1px solid var(--border2);cursor:pointer;text-decoration:none;transition:all .2s}
+    .btn-outline:hover{background:var(--surface)}
+    .btn-services{display:inline-flex;align-items:center;gap:8px;background:rgba(255,181,71,.07);color:var(--amber);font-family:var(--font);font-size:14px;font-weight:700;padding:11px 22px;border-radius:9px;border:1px solid rgba(255,181,71,.35);cursor:pointer;text-decoration:none;transition:all .2s}
+    .btn-services:hover{background:rgba(255,181,71,.15);transform:translateY(-1px)}
 
-    /* ── Scanline ── */
-    .scanline {
-      position: fixed; inset: 0;
-      background: repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.025) 2px,rgba(0,0,0,0.025) 4px);
-      pointer-events: none; z-index: 1000;
-    }
+    /* TV */
+    .news-tv-wrap{position:relative;cursor:pointer}
+    .news-tv-wrap:hover .tv-click-hint{opacity:1;transform:translateX(-50%) translateY(0)}
+    .tv-body{background:linear-gradient(145deg,#1a2030,#0f1520);border:2px solid #2a3348;border-radius:18px;padding:10px;box-shadow:0 0 0 1px rgba(0,229,160,.08),0 32px 80px rgba(0,0,0,.6),inset 0 1px 0 rgba(255,255,255,.05);position:relative}
+    .tv-body::after{content:'';position:absolute;inset:10px;background:repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(0,0,0,.08) 3px,rgba(0,0,0,.08) 4px);border-radius:10px;pointer-events:none;z-index:10}
+    .tv-top-bar{display:flex;align-items:center;justify-content:space-between;padding:6px 10px 8px}
+    .tv-channel{font-family:var(--mono);font-size:10px;color:var(--red);letter-spacing:.12em;display:flex;align-items:center;gap:5px}
+    .tv-rec-dot{width:7px;height:7px;background:var(--red);border-radius:50%;animation:blink 1s infinite}
+    .tv-signal{display:flex;gap:3px;align-items:flex-end}
+    .tv-signal span{width:3px;background:var(--accent);border-radius:1px;opacity:.6}
+    .tv-signal span:nth-child(1){height:6px}.tv-signal span:nth-child(2){height:10px}.tv-signal span:nth-child(3){height:14px}.tv-signal span:nth-child(4){height:18px;animation:sig 2s infinite}
+    @keyframes sig{0%,100%{opacity:.6}50%{opacity:1}}
+    .tv-screen{background:#060810;border-radius:10px;overflow:hidden;border:1px solid rgba(0,229,160,.15);box-shadow:inset 0 0 40px rgba(0,229,160,.04),0 0 20px rgba(0,229,160,.06)}
+    .tv-ticker{font-family:var(--mono);font-size:9px;color:var(--red);background:rgba(255,77,77,.12);border-bottom:1px solid rgba(255,77,77,.2);padding:5px 10px;letter-spacing:.06em;display:flex;align-items:center;gap:8px;overflow:hidden}
+    .tv-ticker-label{background:var(--red);color:white;font-size:8px;font-weight:700;padding:2px 6px;border-radius:3px;white-space:nowrap;letter-spacing:.1em;flex-shrink:0}
+    .ticker-scroll-wrap{overflow:hidden;flex:1}
+    .ticker-scroll{white-space:nowrap;animation:ticker 22s linear infinite}
+    @keyframes ticker{0%{transform:translateX(100%)}100%{transform:translateX(-100%)}}
+    .tv-news-area{padding:14px 16px}
+    .tv-news-timestamp{font-family:var(--mono);font-size:10px;color:var(--text3);margin-bottom:8px;display:flex;align-items:center;gap:6px}
+    .ts-dot{width:5px;height:5px;background:var(--amber);border-radius:50%;animation:blink 2s infinite}
+    .tv-news-headline{font-size:13px;font-weight:700;color:var(--text);line-height:1.4;margin-bottom:8px;min-height:36px;transition:opacity .4s}
+    .tv-news-body{font-family:var(--mono);font-size:10px;color:var(--text2);line-height:1.6;margin-bottom:12px;min-height:44px;transition:opacity .4s}
+    .tv-news-severity{display:inline-flex;align-items:center;gap:5px;font-family:var(--mono);font-size:9px;font-weight:700;padding:3px 8px;border-radius:4px;letter-spacing:.07em;transition:opacity .4s}
+    .sev-critical{background:rgba(255,77,77,.15);color:var(--red);border:1px solid rgba(255,77,77,.3)}
+    .sev-high{background:rgba(255,181,71,.15);color:var(--amber);border:1px solid rgba(255,181,71,.3)}
+    .sev-medium{background:rgba(77,158,255,.15);color:var(--blue);border:1px solid rgba(77,158,255,.3)}
+    .tv-news-list{border-top:1px solid rgba(255,255,255,.06);margin:12px 16px 0;padding-top:10px;padding-bottom:4px}
+    .tv-news-item{display:flex;gap:8px;padding:5px 0;border-bottom:1px solid rgba(255,255,255,.04);align-items:flex-start}
+    .news-num{font-family:var(--mono);font-size:9px;color:var(--text3);width:16px;flex-shrink:0;padding-top:2px}
+    .news-item-text{font-family:var(--mono);font-size:10px;color:var(--text2);line-height:1.5}
+    .news-item-text strong{color:var(--accent)}
+    .tv-bottom-bar{display:flex;align-items:center;justify-content:space-between;padding:8px 12px 4px}
+    .tv-source{font-family:var(--mono);font-size:9px;color:var(--text3)}
+    .tv-time{font-family:var(--mono);font-size:9px;color:var(--text3)}
+    .tv-click-hint{position:absolute;bottom:-42px;left:50%;transform:translateX(-50%) translateY(6px);font-family:var(--mono);font-size:11px;color:var(--accent);background:var(--accent-dim);border:1px solid rgba(0,229,160,.25);padding:5px 14px;border-radius:20px;white-space:nowrap;opacity:0;transition:all .3s;pointer-events:none;display:flex;align-items:center;gap:6px}
+    .tv-stand{display:flex;flex-direction:column;align-items:center;margin-top:2px}
+    .tv-stand-neck{width:40px;height:12px;background:linear-gradient(180deg,#1a2030,#141820);border-left:1px solid #2a3348;border-right:1px solid #2a3348}
+    .tv-stand-base{width:110px;height:7px;background:linear-gradient(180deg,#1a2030,#0f1520);border-radius:0 0 8px 8px;border:1px solid #2a3348;border-top:none}
 
-    /* ── Noise grain overlay ── */
-    body::before {
-      content:'';
-      position:fixed; inset:0;
-      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
-      pointer-events:none; z-index:999; opacity:0.4;
-    }
+    /* SHARED */
+    section{position:relative}
+    .container{max-width:1260px;margin:0 auto;padding:0 24px}
+    .sec-tag{display:inline-flex;align-items:center;gap:7px;font-family:var(--mono);font-size:11px;color:var(--accent);background:var(--accent-dim);border:1px solid rgba(0,229,160,.2);padding:4px 12px;border-radius:20px;margin-bottom:16px;letter-spacing:.05em}
+    .sec-h2{font-size:clamp(26px,4vw,42px);font-weight:800;letter-spacing:-.04em;margin-bottom:14px}
+    .sec-p{font-size:14px;color:var(--text2);line-height:1.75;max-width:620px}
+    .sec-head-row{display:flex;align-items:flex-end;justify-content:space-between;gap:24px;margin-bottom:48px;flex-wrap:wrap}
 
-    /* ── NAV ── */
-    .nav {
-      position: sticky; top: 0; z-index: 100;
-      background: rgba(10,12,16,0.88);
-      backdrop-filter: blur(14px);
-      border-bottom: 1px solid var(--border);
-    }
-    .nav-inner {
-      max-width: 1200px; margin: 0 auto;
-      padding: 0 28px; height: 64px;
-      display: flex; align-items: center; justify-content: space-between;
-    }
-    .logo {
-      display: flex; align-items: center; gap: 10px;
-      text-decoration: none; color: var(--text);
-    }
-    .logo-shield { color: var(--accent); display: flex; }
-    .logo-name { font-size: 20px; font-weight: 900; letter-spacing: -0.03em; }
-    .logo-v { font-family: var(--mono); font-size: 10px; color: var(--accent); background: var(--accent-dim); border: 1px solid rgba(0,229,160,0.2); padding: 2px 7px; border-radius: 4px; letter-spacing: 0.08em; margin-left: 2px; }
-    .nav-links { display: flex; align-items: center; gap: 2px; }
-    .nav-a {
-      font-size: 13px; font-weight: 600; color: var(--text2);
-      text-decoration: none; padding: 7px 14px; border-radius: 7px;
-      transition: all 0.2s; display: flex; align-items: center; gap: 6px;
-    }
-    .nav-a:hover { color: var(--text); background: var(--surface); }
-    .nav-cta {
-      background: var(--accent); color: #001a0e !important;
-      font-weight: 700; border-radius: 7px; padding: 7px 18px;
-      margin-left: 8px; transition: background 0.2s;
-    }
-    .nav-cta:hover { background: var(--accent2) !important; }
+    /* TOOLS */
+    .tools-section{padding:90px 0;background:linear-gradient(180deg,var(--bg) 0%,var(--bg2) 100%)}
+    .tools-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+    .tool-card{background:var(--surface);border:1px solid var(--border2);border-radius:var(--rl);padding:26px;display:flex;flex-direction:column;transition:all .25s;position:relative;overflow:hidden;text-decoration:none;color:inherit}
+    .tool-card::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(0,229,160,.04) 0%,transparent 60%);opacity:0;transition:opacity .3s}
+    .tool-card:hover{border-color:rgba(0,229,160,.3);transform:translateY(-3px);box-shadow:0 20px 60px rgba(0,0,0,.3)}
+    .tool-card:hover::before{opacity:1}
+    .tool-card.cs{opacity:.6;cursor:default}
+    .tool-card.cs:hover{transform:none;border-color:var(--border2);box-shadow:none}
+    .tool-card.cs:hover::before{opacity:0}
+    .tbrow{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
+    .ti{width:46px;height:46px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+    .ti.g{background:var(--accent-dim);border:1px solid rgba(0,229,160,.2)}.ti.b{background:var(--blue-bg);border:1px solid rgba(77,158,255,.2)}.ti.r{background:var(--red-bg);border:1px solid rgba(255,77,77,.2)}.ti.p{background:rgba(167,139,250,.1);border:1px solid rgba(167,139,250,.2)}.ti.a{background:var(--amber-bg);border:1px solid rgba(255,181,71,.2)}
+    .lp{font-family:var(--mono);font-size:10px;font-weight:700;padding:3px 9px;border-radius:20px;background:var(--accent-dim);color:var(--accent);border:1px solid rgba(0,229,160,.25);letter-spacing:.06em;display:flex;align-items:center;gap:5px}
+    .sp{font-family:var(--mono);font-size:10px;font-weight:700;padding:3px 9px;border-radius:20px;background:rgba(255,255,255,.05);color:var(--text3);border:1px solid var(--border)}
+    .ld{width:5px;height:5px;background:var(--accent);border-radius:50%;animation:blink 1.5s infinite}
+    .tn{font-size:17px;font-weight:800;letter-spacing:-.02em;margin-bottom:8px}
+    .td{font-size:13px;color:var(--text2);line-height:1.6;flex:1;margin-bottom:18px}
+    .tt{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:18px}
+    .tag{font-family:var(--mono);font-size:10px;padding:2px 8px;border-radius:5px;background:var(--bg3);border:1px solid var(--border);color:var(--text3)}
+    .tla{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:700;color:var(--accent);background:var(--accent-dim);border:1px solid rgba(0,229,160,.2);padding:7px 14px;border-radius:7px;text-decoration:none;transition:all .2s;width:fit-content;margin-top:auto}
+    .tla:hover{background:rgba(0,229,160,.2)}
+    .tld{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:700;color:var(--text3);background:transparent;border:1px solid var(--border);padding:7px 14px;border-radius:7px;width:fit-content;margin-top:auto;cursor:not-allowed}
 
-    /* ── HERO ── */
-    .hero {
-      position: relative; overflow: hidden;
-      min-height: 100vh; display: flex; align-items: center;
-    }
-    .hero-bg {
-      position: absolute; inset: 0;
-      background:
-        radial-gradient(ellipse 70% 60% at 60% 40%, rgba(0,229,160,0.06) 0%, transparent 70%),
-        radial-gradient(ellipse 50% 40% at 20% 80%, rgba(77,158,255,0.05) 0%, transparent 60%);
-    }
-    .hero-grid {
-      position: absolute; inset: 0;
-      background-image: linear-gradient(var(--border) 1px, transparent 1px), linear-gradient(90deg, var(--border) 1px, transparent 1px);
-      background-size: 44px 44px;
-      mask-image: radial-gradient(ellipse 90% 80% at 55% 45%, black 20%, transparent 75%);
-    }
-    /* animated orb */
-    .hero-orb {
-      position: absolute; right: 8%; top: 50%; transform: translateY(-50%);
-      width: 480px; height: 480px; border-radius: 50%;
-      background: radial-gradient(circle, rgba(0,229,160,0.12) 0%, rgba(0,229,160,0.04) 40%, transparent 70%);
-      animation: orb-pulse 8s ease-in-out infinite;
-      pointer-events: none;
-    }
-    @keyframes orb-pulse { 0%,100%{transform:translateY(-50%) scale(1);opacity:0.8} 50%{transform:translateY(-50%) scale(1.08);opacity:1} }
+    /* SERVICES */
+    .services-section{padding:90px 0;background:var(--bg2);border-top:1px solid var(--border)}
+    .ag{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+    .ac{background:var(--surface);border:1px solid var(--border2);border-radius:var(--rl);padding:24px;transition:all .25s}
+    .ac:hover{border-color:rgba(0,229,160,.25);transform:translateY(-2px)}
+    .ai{width:42px;height:42px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;margin-bottom:16px}
+    .at2{font-size:15px;font-weight:700;margin-bottom:8px}
+    .ab2{font-size:13px;color:var(--text2);line-height:1.6;margin-bottom:14px}
+    .al{font-family:var(--mono);font-size:11px;color:var(--accent);text-decoration:none;display:flex;align-items:center;gap:5px;transition:gap .2s}
+    .al:hover{gap:9px}
 
-    .hero-inner {
-      position: relative; z-index: 2;
-      max-width: 1200px; margin: 0 auto; padding: 120px 28px 80px;
-      display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center;
-    }
-    .hero-tag {
-      display: inline-flex; align-items: center; gap: 8px;
-      font-family: var(--mono); font-size: 11px; color: var(--accent);
-      background: var(--accent-dim); border: 1px solid rgba(0,229,160,0.2);
-      padding: 5px 14px; border-radius: 20px; margin-bottom: 24px;
-      letter-spacing: 0.04em; width: fit-content;
-    }
-    .blink { width: 6px; height: 6px; background: var(--accent); border-radius: 50%; animation: blink 1.5s infinite; flex-shrink: 0; }
-    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.15} }
+    /* TEAM */
+    .team-section{padding:90px 0;background:var(--bg);border-top:1px solid var(--border)}
+    .tf{background:var(--surface);border:1px solid rgba(0,229,160,.2);border-radius:var(--rl);padding:36px;display:grid;grid-template-columns:auto 1fr;gap:28px;align-items:center;margin-bottom:36px;position:relative;overflow:hidden}
+    .tf::before{content:'';position:absolute;top:-40px;right:-40px;width:200px;height:200px;border-radius:50%;background:radial-gradient(circle,rgba(0,229,160,.08) 0%,transparent 70%);pointer-events:none}
+    .fa{width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,rgba(0,229,160,.3),rgba(77,158,255,.2));border:2px solid rgba(0,229,160,.4);display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:900;color:var(--accent);font-family:var(--mono);flex-shrink:0}
+    .fr{font-family:var(--mono);font-size:11px;color:var(--accent);letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px}
+    .fn{font-size:26px;font-weight:900;letter-spacing:-.03em;margin-bottom:10px}
+    .fb{font-size:14px;color:var(--text2);line-height:1.7;max-width:560px}
+    .tg{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}
+    .tc{background:var(--surface);border:1px solid var(--border2);border-radius:var(--r);padding:18px 14px;text-align:center;transition:all .2s}
+    .tc:hover{border-color:rgba(0,229,160,.25);transform:translateY(-2px)}
+    .tav{width:50px;height:50px;border-radius:50%;margin:0 auto 10px;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:800;font-family:var(--mono);background:var(--surface2);border:1px solid var(--border2)}
+    .tmn{font-size:12px;font-weight:700;margin-bottom:4px}
+    .tmr{font-size:10px;color:var(--text3);font-family:var(--mono);line-height:1.4}
 
-    .hero-h1 {
-      font-size: clamp(42px, 6vw, 72px); font-weight: 900;
-      line-height: 1.0; letter-spacing: -0.05em; margin-bottom: 24px;
-    }
-    .hero-h1 .line2 { color: var(--accent); }
-    .hero-h1 .line3 { color: var(--text2); font-weight: 700; font-size: 0.65em; letter-spacing: -0.02em; margin-top: 6px; display: block; }
+    /* CTA */
+    .cta-section{padding:80px 0;background:linear-gradient(135deg,rgba(0,229,160,.06) 0%,transparent 50%);border-top:1px solid var(--border)}
+    .cta-inner{text-align:center}
+    .cta-h2{font-size:clamp(26px,4vw,46px);font-weight:900;letter-spacing:-.04em;margin-bottom:14px}
+    .cta-p{font-size:14px;color:var(--text2);margin-bottom:28px}
+    .cta-btns{display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap}
 
-    .hero-p {
-      font-size: 15px; color: var(--text2); line-height: 1.75;
-      max-width: 460px; margin-bottom: 36px;
-    }
-    .hero-btns { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 48px; }
-    .btn-primary {
-      display: inline-flex; align-items: center; gap: 8px;
-      background: var(--accent); color: #001a0e; font-family: var(--font);
-      font-size: 14px; font-weight: 700; padding: 12px 24px; border-radius: 9px;
-      border: none; cursor: pointer; text-decoration: none; transition: all 0.2s;
-    }
-    .btn-primary:hover { background: var(--accent2); transform: translateY(-1px); }
-    .btn-outline {
-      display: inline-flex; align-items: center; gap: 8px;
-      background: transparent; color: var(--text); font-family: var(--font);
-      font-size: 14px; font-weight: 600; padding: 12px 24px; border-radius: 9px;
-      border: 1px solid var(--border2); cursor: pointer; text-decoration: none; transition: all 0.2s;
-    }
-    .btn-outline:hover { background: var(--surface); border-color: rgba(255,255,255,0.2); }
+    /* FOOTER */
+    footer{background:var(--bg);border-top:1px solid var(--border);padding:40px 0}
+    .fi{display:grid;grid-template-columns:1fr 1fr 1fr;gap:32px;margin-bottom:36px}
+    .ft{font-size:13px;color:var(--text3);margin-top:8px;line-height:1.6;max-width:240px}
+    .fct{font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:12px}
+    .fl{display:flex;flex-direction:column;gap:8px}
+    .fla{font-size:13px;color:var(--text2);text-decoration:none;transition:color .2s}
+    .fla:hover{color:var(--accent)}
+    .fb2{display:flex;align-items:center;justify-content:space-between;border-top:1px solid var(--border);padding-top:22px;flex-wrap:wrap;gap:12px}
+    .fc{font-family:var(--mono);font-size:11px;color:var(--text3)}
+    .flv{font-family:var(--mono);font-size:11px;color:var(--text3)}
+    .flv span{color:var(--red)}
 
-    .hero-trust { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
-    .trust-item { display: flex; align-items: center; gap: 7px; font-family: var(--mono); font-size: 11px; color: var(--text3); }
-    .trust-dot { width: 5px; height: 5px; background: var(--accent); border-radius: 50%; }
+    /* ANIM */
+    .fade-up{opacity:0;transform:translateY(24px);transition:opacity .6s ease,transform .6s ease}
+    .fade-up.visible{opacity:1;transform:translateY(0)}
 
-    /* Hero right — stat cards */
-    .hero-right { display: flex; flex-direction: column; gap: 16px; }
-    .hero-stat-card {
-      background: var(--surface); border: 1px solid var(--border2);
-      border-radius: var(--rl); padding: 20px 24px;
-      display: flex; align-items: center; gap: 18px;
-      transition: border-color 0.2s, transform 0.2s;
-      animation: card-float linear infinite;
-    }
-    .hero-stat-card:nth-child(1) { animation-duration: 7s; animation-delay: 0s; }
-    .hero-stat-card:nth-child(2) { animation-duration: 9s; animation-delay: -3s; }
-    .hero-stat-card:nth-child(3) { animation-duration: 8s; animation-delay: -5s; }
-    @keyframes card-float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-5px)} }
-    .hero-stat-card:hover { border-color: rgba(0,229,160,0.3); }
-    .stat-icon {
-      width: 46px; height: 46px; border-radius: 12px;
-      background: var(--accent-dim); border: 1px solid rgba(0,229,160,0.2);
-      display: flex; align-items: center; justify-content: center;
-      color: var(--accent); flex-shrink: 0;
-    }
-    .stat-icon.blue { background: var(--blue-bg); border-color: rgba(77,158,255,0.2); color: var(--blue); }
-    .stat-icon.red  { background: var(--red-bg);  border-color: rgba(255,77,77,0.2);  color: var(--red);  }
-    .stat-num  { font-family: var(--mono); font-size: 28px; font-weight: 700; color: var(--text); line-height: 1; }
-    .stat-lbl  { font-size: 12px; color: var(--text2); margin-top: 3px; }
-
-    /* ── SECTION SHARED ── */
-    section { position: relative; }
-    .container { max-width: 1200px; margin: 0 auto; padding: 0 28px; }
-    .sec-tag {
-      display: inline-flex; align-items: center; gap: 7px;
-      font-family: var(--mono); font-size: 11px; color: var(--accent);
-      background: var(--accent-dim); border: 1px solid rgba(0,229,160,0.2);
-      padding: 4px 12px; border-radius: 20px; margin-bottom: 16px;
-      letter-spacing: 0.05em;
-    }
-    .sec-h2 { font-size: clamp(28px, 4vw, 44px); font-weight: 800; letter-spacing: -0.04em; margin-bottom: 14px; }
-    .sec-p { font-size: 15px; color: var(--text2); line-height: 1.75; max-width: 560px; }
-    .sec-head-row { display: flex; align-items: flex-end; justify-content: space-between; gap: 24px; margin-bottom: 48px; flex-wrap: wrap; }
-
-    /* ── TOOLS ── */
-    .tools-section { padding: 100px 0; background: linear-gradient(180deg, var(--bg) 0%, var(--bg2) 100%); }
-    .tools-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
-    .tool-card {
-      background: var(--surface); border: 1px solid var(--border2);
-      border-radius: var(--rl); padding: 28px;
-      display: flex; flex-direction: column; gap: 0;
-      transition: all 0.25s; position: relative; overflow: hidden;
-      text-decoration: none; color: inherit;
-    }
-    .tool-card::before {
-      content: ''; position: absolute; inset: 0;
-      background: linear-gradient(135deg, rgba(0,229,160,0.04) 0%, transparent 60%);
-      opacity: 0; transition: opacity 0.3s;
-    }
-    .tool-card:hover { border-color: rgba(0,229,160,0.3); transform: translateY(-3px); box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
-    .tool-card:hover::before { opacity: 1; }
-    .tool-card.coming-soon { opacity: 0.6; cursor: default; }
-    .tool-card.coming-soon:hover { transform: none; border-color: var(--border2); box-shadow: none; }
-    .tool-card.coming-soon:hover::before { opacity: 0; }
-
-    .tool-badge-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
-    .tool-icon {
-      width: 48px; height: 48px; border-radius: 12px;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 22px; flex-shrink: 0;
-    }
-    .tool-icon.green  { background: var(--accent-dim); border: 1px solid rgba(0,229,160,0.2); }
-    .tool-icon.blue   { background: var(--blue-bg);  border: 1px solid rgba(77,158,255,0.2); }
-    .tool-icon.red    { background: var(--red-bg);   border: 1px solid rgba(255,77,77,0.2); }
-    .tool-icon.purple { background: rgba(167,139,250,0.1); border: 1px solid rgba(167,139,250,0.2); }
-    .tool-icon.amber  { background: var(--amber-bg); border: 1px solid rgba(255,181,71,0.2); }
-
-    .live-pill   { font-family: var(--mono); font-size: 10px; font-weight: 700; padding: 3px 9px; border-radius: 20px; background: var(--accent-dim); color: var(--accent); border: 1px solid rgba(0,229,160,0.25); letter-spacing: 0.06em; display: flex; align-items: center; gap: 5px; }
-    .soon-pill   { font-family: var(--mono); font-size: 10px; font-weight: 700; padding: 3px 9px; border-radius: 20px; background: rgba(255,255,255,0.05); color: var(--text3); border: 1px solid var(--border); }
-    .live-dot    { width: 5px; height: 5px; background: var(--accent); border-radius: 50%; animation: blink 1.5s infinite; }
-
-    .tool-name { font-size: 18px; font-weight: 800; letter-spacing: -0.02em; margin-bottom: 8px; }
-    .tool-desc { font-size: 13px; color: var(--text2); line-height: 1.6; flex: 1; margin-bottom: 20px; }
-    .tool-tags  { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 20px; }
-    .tag { font-family: var(--mono); font-size: 10px; padding: 2px 8px; border-radius: 5px; background: var(--bg3); border: 1px solid var(--border); color: var(--text3); }
-    .tool-link {
-      display: inline-flex; align-items: center; gap: 6px;
-      font-size: 12px; font-weight: 700; color: var(--accent);
-      background: var(--accent-dim); border: 1px solid rgba(0,229,160,0.2);
-      padding: 7px 14px; border-radius: 7px; text-decoration: none;
-      transition: all 0.2s; width: fit-content; margin-top: auto;
-    }
-    .tool-link:hover { background: rgba(0,229,160,0.2); }
-    .tool-link-disabled {
-      display: inline-flex; align-items: center; gap: 6px;
-      font-size: 12px; font-weight: 700; color: var(--text3);
-      background: transparent; border: 1px solid var(--border);
-      padding: 7px 14px; border-radius: 7px;
-      width: fit-content; margin-top: auto; cursor: not-allowed;
-    }
-
-    /* ── SERVICES / AWARENESS ── */
-    .services-section { padding: 100px 0; background: var(--bg2); border-top: 1px solid var(--border); }
-    .awareness-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
-    .awareness-card {
-      background: var(--surface); border: 1px solid var(--border2);
-      border-radius: var(--rl); padding: 24px; transition: all 0.25s;
-    }
-    .awareness-card:hover { border-color: rgba(0,229,160,0.25); transform: translateY(-2px); }
-    .aware-icon {
-      width: 42px; height: 42px; border-radius: 10px;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 20px; margin-bottom: 16px;
-    }
-    .aware-title { font-size: 15px; font-weight: 700; margin-bottom: 8px; }
-    .aware-body  { font-size: 13px; color: var(--text2); line-height: 1.6; margin-bottom: 14px; }
-    .aware-link  { font-family: var(--mono); font-size: 11px; color: var(--accent); text-decoration: none; display: flex; align-items: center; gap: 5px; transition: gap 0.2s; }
-    .aware-link:hover { gap: 9px; }
-
-    /* ── FUTURE / ROADMAP ── */
-    .future-section { padding: 100px 0; background: var(--bg); border-top: 1px solid var(--border); }
-    .roadmap-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; }
-    .roadmap-card {
-      background: var(--surface); border: 1px solid var(--border2);
-      border-radius: var(--rl); padding: 28px; position: relative;
-      overflow: hidden; transition: all 0.25s;
-    }
-    .roadmap-card::after {
-      content: ''; position: absolute; top: 0; left: 0;
-      width: 3px; height: 100%; background: linear-gradient(180deg, var(--accent), transparent);
-    }
-    .roadmap-card.blue::after { background: linear-gradient(180deg, var(--blue), transparent); }
-    .roadmap-card.red::after  { background: linear-gradient(180deg, var(--red), transparent); }
-    .roadmap-card.purple::after { background: linear-gradient(180deg, var(--purple), transparent); }
-    .roadmap-card:hover { border-color: rgba(0,229,160,0.25); transform: translateY(-2px); }
-
-    .rm-phase { font-family: var(--mono); font-size: 10px; color: var(--text3); letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 8px; }
-    .rm-title { font-size: 18px; font-weight: 800; letter-spacing: -0.02em; margin-bottom: 10px; }
-    .rm-body  { font-size: 13px; color: var(--text2); line-height: 1.65; margin-bottom: 16px; }
-    .rm-tags  { display: flex; flex-wrap: wrap; gap: 6px; }
-    .rm-tag   { font-family: var(--mono); font-size: 10px; padding: 3px 9px; border-radius: 20px; background: var(--bg3); border: 1px solid var(--border); color: var(--text3); }
-
-    /* ── TEAM ── */
-    .team-section { padding: 100px 0; background: var(--bg2); border-top: 1px solid var(--border); }
-    .team-founder {
-      background: var(--surface); border: 1px solid rgba(0,229,160,0.2);
-      border-radius: var(--rl); padding: 40px; display: grid;
-      grid-template-columns: auto 1fr; gap: 32px; align-items: center;
-      margin-bottom: 40px; position: relative; overflow: hidden;
-    }
-    .team-founder::before {
-      content: ''; position: absolute; top: -40px; right: -40px;
-      width: 200px; height: 200px; border-radius: 50%;
-      background: radial-gradient(circle, rgba(0,229,160,0.08) 0%, transparent 70%);
-      pointer-events: none;
-    }
-    .founder-avatar {
-      width: 90px; height: 90px; border-radius: 50%;
-      background: linear-gradient(135deg, rgba(0,229,160,0.3), rgba(77,158,255,0.2));
-      border: 2px solid rgba(0,229,160,0.4);
-      display: flex; align-items: center; justify-content: center;
-      font-size: 36px; font-weight: 900; color: var(--accent);
-      font-family: var(--mono); flex-shrink: 0;
-    }
-    .founder-role { font-family: var(--mono); font-size: 11px; color: var(--accent); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 6px; }
-    .founder-name { font-size: 28px; font-weight: 900; letter-spacing: -0.03em; margin-bottom: 10px; }
-    .founder-bio  { font-size: 14px; color: var(--text2); line-height: 1.7; max-width: 560px; }
-
-    .team-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 14px; }
-    .team-card {
-      background: var(--surface); border: 1px solid var(--border2);
-      border-radius: var(--r); padding: 20px 16px; text-align: center;
-      transition: all 0.2s;
-    }
-    .team-card:hover { border-color: rgba(0,229,160,0.25); transform: translateY(-2px); }
-    .team-avatar {
-      width: 52px; height: 52px; border-radius: 50%; margin: 0 auto 12px;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 18px; font-weight: 800; font-family: var(--mono);
-      background: var(--surface2); border: 1px solid var(--border2);
-      color: var(--text2);
-    }
-    .team-member-name { font-size: 13px; font-weight: 700; margin-bottom: 4px; }
-    .team-member-role { font-size: 11px; color: var(--text3); font-family: var(--mono); }
-
-    /* ── CTA STRIP ── */
-    .cta-section {
-      padding: 80px 0;
-      background: linear-gradient(135deg, rgba(0,229,160,0.06) 0%, transparent 50%);
-      border-top: 1px solid var(--border);
-    }
-    .cta-inner { text-align: center; }
-    .cta-h2 { font-size: clamp(28px, 4vw, 48px); font-weight: 900; letter-spacing: -0.04em; margin-bottom: 16px; }
-    .cta-p  { font-size: 15px; color: var(--text2); margin-bottom: 32px; }
-    .cta-btns { display: flex; align-items: center; justify-content: center; gap: 12px; flex-wrap: wrap; }
-
-    /* ── FOOTER ── */
-    footer {
-      background: var(--bg); border-top: 1px solid var(--border); padding: 40px 0;
-    }
-    .footer-inner {
-      display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 32px; margin-bottom: 40px;
-    }
-    .footer-brand .logo-name { font-size: 22px; }
-    .footer-tagline { font-size: 13px; color: var(--text3); margin-top: 8px; line-height: 1.6; max-width: 260px; }
-    .footer-col-title { font-size: 12px; font-weight: 700; color: var(--text3); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 14px; }
-    .footer-links { display: flex; flex-direction: column; gap: 8px; }
-    .footer-link { font-size: 13px; color: var(--text2); text-decoration: none; transition: color 0.2s; }
-    .footer-link:hover { color: var(--accent); }
-    .footer-bottom { display: flex; align-items: center; justify-content: space-between; border-top: 1px solid var(--border); padding-top: 24px; flex-wrap: wrap; gap: 12px; }
-    .footer-copy { font-family: var(--mono); font-size: 11px; color: var(--text3); }
-    .footer-love { font-family: var(--mono); font-size: 11px; color: var(--text3); }
-    .footer-love span { color: var(--red); }
-
-    /* ── Animations ── */
-    .fade-up { opacity: 0; transform: translateY(24px); transition: opacity 0.6s ease, transform 0.6s ease; }
-    .fade-up.visible { opacity: 1; transform: translateY(0); }
-
-    /* ── Responsive ── */
-    @media(max-width:1000px){
-      .tools-grid { grid-template-columns: repeat(2,1fr); }
-      .team-grid  { grid-template-columns: repeat(3,1fr); }
-      .footer-inner { grid-template-columns: 1fr 1fr; }
-    }
-    @media(max-width:800px){
-      .hero-inner { grid-template-columns: 1fr; padding: 80px 20px 60px; }
-      .hero-right { display: none; }
-      .awareness-grid { grid-template-columns: 1fr; }
-      .roadmap-grid   { grid-template-columns: 1fr; }
-      .team-founder   { grid-template-columns: 1fr; text-align: center; }
-      .team-grid      { grid-template-columns: repeat(2,1fr); }
-      .footer-inner   { grid-template-columns: 1fr; }
-    }
-    @media(max-width:600px){
-      .tools-grid { grid-template-columns: 1fr; }
-      .nav-inner  { padding: 0 16px; }
-      .container  { padding: 0 16px; }
-    }
-
-    ::-webkit-scrollbar{width:6px;height:6px} ::-webkit-scrollbar-track{background:var(--bg2)} ::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
+    /* RESPONSIVE */
+    @media(max-width:1100px){.tools-grid{grid-template-columns:repeat(2,1fr)}.ag{grid-template-columns:repeat(2,1fr)}.tg{grid-template-columns:repeat(3,1fr)}}
+    @media(max-width:900px){.nav-links{display:none}.hamburger{display:flex}.hero-inner{grid-template-columns:1fr;padding:80px 20px 80px;gap:40px}.hero-h1{font-size:clamp(32px,8vw,54px)}.news-tv-wrap{max-width:480px;margin:0 auto}.tv-click-hint{opacity:.85;transform:translateX(-50%) translateY(0)}.tf{grid-template-columns:1fr;text-align:center}.fa{margin:0 auto}.fi{grid-template-columns:1fr 1fr}}
+    @media(max-width:680px){.tools-grid{grid-template-columns:1fr}.ag{grid-template-columns:1fr}.tg{grid-template-columns:repeat(2,1fr)}.fi{grid-template-columns:1fr}.hero-btns{flex-direction:column;align-items:stretch}.hero-btns a{justify-content:center}.cta-btns{flex-direction:column;align-items:center}.cta-btns a{width:100%;max-width:300px;justify-content:center}}
+    @media(max-width:400px){.hero-h1{font-size:30px}.tg{grid-template-columns:repeat(2,1fr)}}
+    ::-webkit-scrollbar{width:6px;height:6px}::-webkit-scrollbar-track{background:var(--bg2)}::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
   </style>
 </head>
 <body>
 <div class="scanline"></div>
 
-<!-- ── NAV ── -->
+<!-- NAV -->
 <nav class="nav">
   <div class="nav-inner">
     <a href="#" class="logo">
-      <span class="logo-shield">
-        <svg width="26" height="26" viewBox="0 0 26 26" fill="none">
-          <path d="M13 2L3 6v7c0 5.5 4.3 10.7 10 12 5.7-1.3 10-6.5 10-12V6L13 2z" stroke="currentColor" stroke-width="1.6" fill="rgba(0,229,160,0.08)"/>
-          <path d="M9 13l3 3 5-5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-      </span>
+      <span class="logo-shield"><svg width="26" height="26" viewBox="0 0 26 26" fill="none"><path d="M13 2L3 6v7c0 5.5 4.3 10.7 10 12 5.7-1.3 10-6.5 10-12V6L13 2z" stroke="currentColor" stroke-width="1.6" fill="rgba(0,229,160,0.08)"/><path d="M9 13l3 3 5-5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
       <span class="logo-name">Cybthreat</span>
     </a>
     <div class="nav-links">
       <a href="#tools" class="nav-a">Tools</a>
-      <a href="#awareness" class="nav-a">Awareness</a>
-      <a href="#roadmap" class="nav-a">Roadmap</a>
+      <a href="#awareness" class="nav-a">Services</a>
       <a href="#team" class="nav-a">Team</a>
-      <a href="#tools" class="nav-a nav-cta">
-        <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M8 2v8M5 8l3 3 3-3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><rect x="2" y="12" width="12" height="2" rx="1" fill="currentColor"/></svg>
-        Launch a Tool
-      </a>
+      <a href="./job-portal/index.html" class="nav-a nav-job"><svg width="13" height="13" viewBox="0 0 16 16" fill="none"><rect x="2" y="5" width="12" height="9" rx="1.5" stroke="currentColor" stroke-width="1.3"/><path d="M5 5V4a3 3 0 016 0v1" stroke="currentColor" stroke-width="1.3"/></svg>Job Portal</a>
+      <a href="#tools" class="nav-a nav-cta"><svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M8 2v8M5 8l3 3 3-3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><rect x="2" y="12" width="12" height="2" rx="1" fill="currentColor"/></svg>Launch a Tool</a>
     </div>
+    <button class="hamburger" id="hamburger" aria-label="Menu"><span></span><span></span><span></span></button>
   </div>
 </nav>
+<div class="mobile-menu" id="mobileMenu">
+  <a href="#tools" class="nav-a" onclick="closeMobileMenu()">⚡ Tools</a>
+  <a href="#awareness" class="nav-a" onclick="closeMobileMenu()">🛡️ Services</a>
+  <a href="#team" class="nav-a" onclick="closeMobileMenu()">👥 Team</a>
+  <a href="./job-portal/index.html" class="nav-a nav-job"><svg width="14" height="14" viewBox="0 0 16 16" fill="none"><rect x="2" y="5" width="12" height="9" rx="1.5" stroke="currentColor" stroke-width="1.3"/><path d="M5 5V4a3 3 0 016 0v1" stroke="currentColor" stroke-width="1.3"/></svg>Job Portal</a>
+  <a href="#tools" class="nav-a nav-cta" onclick="closeMobileMenu()">🚀 Launch a Tool</a>
+</div>
 
-<!-- ── HERO ── -->
+<!-- HERO -->
 <section class="hero">
-  <div class="hero-bg"></div>
-  <div class="hero-grid"></div>
-  <div class="hero-orb"></div>
+  <div class="hero-bg"></div><div class="hero-grid"></div>
   <div class="hero-inner">
-    <div class="hero-content">
-      <div class="hero-tag">
-        <span class="blink"></span>
-        Active — 10+ Security Researchers & over 500+ members
-      </div>
-      <h1 class="hero-h1">
-        Defending<br/>
-        <span class="line2">the Digital World</span>
-      </h1>
-      <p class="hero-p">Welcome to Cybthreat, a community-driven powerhouse of 10+ core security professionals and a thriving network of over 500 members. We bridge the gap between complex threats and effective defense by providing free security tools, expert consultancy, and an ecosystem built for career growth.</p>
-      <p class="hero-p">Whether you are looking for the latest threat intelligence or requiring professional security consulting, Cybthreat is your dedicated partner in cyber resilience.</p>
+    <div>
+      <div class="hero-tag"><span class="blink"></span>Active — 10+ Core Researchers &amp; 500+ Members</div>
+      <h1 class="hero-h1">Defending<br/><span class="line2">the Digital World</span></h1>
+      <p class="hero-p">Welcome to Cybthreat — a community-driven powerhouse of 10+ core security professionals and a thriving network of over 500 members. We bridge the gap between complex threats and effective defense through free security tools, expert consultancy, and an ecosystem built for career growth.</p>
+      <p class="hero-p">Whether you need the latest threat intelligence or professional security consulting, Cybthreat is your dedicated partner in cyber resilience.</p>
       <div class="hero-btns">
-        <a href="#tools" class="btn-primary">
-          <svg width="15" height="15" viewBox="0 0 16 16" fill="none"><rect x="1" y="3" width="14" height="10" rx="2" stroke="currentColor" stroke-width="1.4"/><path d="M5 7h6M5 10h4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
-          Explore Our Tools
-        </a>
+        <a href="#tools" class="btn-primary"><svg width="15" height="15" viewBox="0 0 16 16" fill="none"><rect x="1" y="3" width="14" height="10" rx="2" stroke="currentColor" stroke-width="1.4"/><path d="M5 7h6M5 10h4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>Explore Our Tools</a>
         <a href="#team" class="btn-outline">Meet the Team →</a>
+        <a href="#awareness" class="btn-services"><svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M8 2L2 5v4c0 4 2.8 7 6 8 3.2-1 6-4 6-8V5L8 2z" stroke="currentColor" stroke-width="1.3"/></svg>Our Services</a>
       </div>
     </div>
-    <div class="hero-right">
-      <div class="hero-stat-card">
-        <div class="stat-icon">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+
+    <!-- TV -->
+    <div class="news-tv-wrap" onclick="window.location.href='./threat-news/index.html'">
+      <div class="tv-body">
+        <div class="tv-top-bar">
+          <div class="tv-channel"><span class="tv-rec-dot"></span>LIVE · CYBTHREAT NEWS</div>
+          <div class="tv-signal"><span></span><span></span><span></span><span></span></div>
         </div>
-        <div>
-          <div class="stat-num">2</div>
-          <div class="stat-lbl">Free Tools Live</div>
+        <div class="tv-screen">
+          <div class="tv-ticker">
+            <span class="tv-ticker-label">BREAKING</span>
+            <div class="ticker-scroll-wrap"><div class="ticker-scroll">⚠ Critical RCE in Apache Struts actively exploited · 🔴 Lazarus Group deploys new ransomware variant · ⚡ Zero-day in Windows SmartScreen under attack · 🛡 CISA adds 3 CVEs to KEV catalog · ⚠ Mass phishing campaign targets Microsoft 365 users · 🔴 New stealer malware via Discord CDN · ⚡ Ivanti VPN zero-day in government networks</div></div>
+          </div>
+          <div class="tv-news-area">
+            <div class="tv-news-timestamp"><span class="ts-dot"></span><span id="liveTime">LIVE THREAT FEED</span></div>
+            <div class="tv-news-headline" id="newsHeadline">Critical Zero-Day in Windows CLFS Driver Actively Exploited by Nation-State Actor</div>
+            <div class="tv-news-body" id="newsBody">CVE-2024-49138 · CVSS 9.8 · Attackers gaining SYSTEM privileges via heap overflow in Common Log File System driver. Emergency patch available.</div>
+            <span class="tv-news-severity sev-critical" id="newsSeverity">● CRITICAL</span>
+          </div>
+          <div class="tv-news-list">
+            <div class="tv-news-item"><span class="news-num">01</span><span class="news-item-text"><strong>Lazarus Group</strong> deploys new MagicRAT variant targeting defence contractors</span></div>
+            <div class="tv-news-item"><span class="news-num">02</span><span class="news-item-text"><strong>Ivanti VPN</strong> zero-day used in US government network attacks · Patch released</span></div>
+            <div class="tv-news-item"><span class="news-num">03</span><span class="news-item-text"><strong>PhaaS platform</strong> Rockstar2FA returns with advanced 2FA bypass capabilities</span></div>
+          </div>
         </div>
+        <div class="tv-bottom-bar"><span class="tv-source">SOURCE: CYBTHREAT INTEL</span><span class="tv-time" id="tvClock">--:--:--</span></div>
       </div>
-      <div class="hero-stat-card">
-        <div class="stat-icon blue">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
-        </div>
-        <div>
-          <div class="stat-num">10+</div>
-          <div class="stat-lbl">Active Researchers</div>
-        </div>
-      </div>
-      <div class="hero-stat-card">
-        <div class="stat-icon red">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 9v4M12 17h.01"/><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/></svg>
-        </div>
-        <div>
-          <div class="stat-num">∞</div>
-          <div class="stat-lbl">Threats Blocked</div>
-        </div>
-      </div>
+      <div class="tv-stand"><div class="tv-stand-neck"></div><div class="tv-stand-base"></div></div>
+      <div class="tv-click-hint"><svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>Click to view full Threat Intel Feed →</div>
     </div>
   </div>
 </section>
 
-<!-- ── TOOLS ── -->
+<!-- TOOLS -->
 <section class="tools-section" id="tools">
   <div class="container">
-    <div class="sec-head-row fade-up">
-      <div>
-        <div class="sec-tag">⚡ Our Arsenal</div>
-        <h2 class="sec-h2">Free Security Tools</h2>
-        <p class="sec-p">Battle-tested, browser-only tools built by the Cybthreat team. No sign-up, no servers, no strings attached.</p>
-      </div>
-    </div>
+    <div class="sec-head-row fade-up"><div><div class="sec-tag">⚡ Our Arsenal</div><h2 class="sec-h2">Free Security Tools</h2><p class="sec-p">Battle-tested, browser-only tools. No sign-up, no servers, no strings attached.</p></div></div>
     <div class="tools-grid">
-
-      <!-- Tool 1 — Email Analyser -->
-      <a href="./email-analyser/index.html" class="tool-card fade-up">
-        <div class="tool-badge-row">
-          <div class="tool-icon green">✉️</div>
-          <span class="live-pill"><span class="live-dot"></span>LIVE</span>
-        </div>
-        <div class="tool-name">Email Header Analyser</div>
-        <p class="tool-desc">Parse raw email headers for phishing indicators, SPF/DKIM/DMARC failures, routing anomalies, malicious URLs, and attachment threats with optional VirusTotal integration.</p>
-        <div class="tool-tags">
-          <span class="tag">SPF</span><span class="tag">DKIM</span><span class="tag">DMARC</span>
-          <span class="tag">GeoIP</span><span class="tag">URL Scan</span><span class="tag">IOC Extract</span>
-        </div>
-        <span class="tool-link">
-          <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
-          Launch Tool
-        </span>
-      </a>
-
-      <!-- Tool 2 — Log Sanitizer -->
-      <a href="./log-sanitizer/index.html" class="tool-card fade-up">
-        <div class="tool-badge-row">
-          <div class="tool-icon blue">🛡️</div>
-          <span class="live-pill"><span class="live-dot"></span>LIVE</span>
-        </div>
-        <div class="tool-name">SOC Log Sanitizer</div>
-        <p class="tool-desc">Strip PII, credentials, IPs, usernames, SIDs, MACs, and secrets from any log format — Windows Event JSON, Syslog, CEF, Apache — with reversible token mapping.</p>
-        <div class="tool-tags">
-          <span class="tag">PII Redact</span><span class="tag">JSON KV</span><span class="tag">Reversible</span>
-          <span class="tag">CEF/Syslog</span><span class="tag">GDPR</span>
-        </div>
-        <span class="tool-link">
-          <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
-          Launch Tool
-        </span>
-      </a>
-
-      <!-- Tool 3 — Coming Soon -->
-      <div class="tool-card coming-soon fade-up">
-        <div class="tool-badge-row">
-          <div class="tool-icon purple">🔍</div>
-          <span class="soon-pill">COMING SOON</span>
-        </div>
-        <div class="tool-name">IOC Intelligence Hub</div>
-        <p class="tool-desc">Bulk lookup IPs, domains, hashes, and URLs against multiple threat intelligence feeds simultaneously. Export findings as structured reports.</p>
-        <div class="tool-tags">
-          <span class="tag">IP Lookup</span><span class="tag">Hash Check</span><span class="tag">Threat Intel</span>
-          <span class="tag">Bulk Export</span>
-        </div>
-        <span class="tool-link-disabled">
-          <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><rect x="4" y="7" width="8" height="7" rx="1" stroke="currentColor" stroke-width="1.3"/><path d="M6 7V5a2 2 0 014 0v2" stroke="currentColor" stroke-width="1.3"/></svg>
-          In Development
-        </span>
-      </div>
-
-      <!-- Tool 4 — Coming Soon -->
-      <div class="tool-card coming-soon fade-up">
-        <div class="tool-badge-row">
-          <div class="tool-icon red">🔐</div>
-          <span class="soon-pill">COMING SOON</span>
-        </div>
-        <div class="tool-name">Password Audit Tool</div>
-        <p class="tool-desc">Check password strength, entropy, and breach exposure. Generate strong passphrases. All hashing done locally — your passwords never leave the page.</p>
-        <div class="tool-tags">
-          <span class="tag">Entropy</span><span class="tag">HIBP Check</span><span class="tag">Local Only</span>
-        </div>
-        <span class="tool-link-disabled">
-          <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><rect x="4" y="7" width="8" height="7" rx="1" stroke="currentColor" stroke-width="1.3"/><path d="M6 7V5a2 2 0 014 0v2" stroke="currentColor" stroke-width="1.3"/></svg>
-          In Development
-        </span>
-      </div>
-
-      <!-- Tool 5 — Coming Soon -->
-      <div class="tool-card coming-soon fade-up">
-        <div class="tool-badge-row">
-          <div class="tool-icon amber">📋</div>
-          <span class="soon-pill">COMING SOON</span>
-        </div>
-        <div class="tool-name">PCAP Quick Analyser</div>
-        <p class="tool-desc">Upload a .pcap file and get instant protocol breakdown, top talkers, suspicious ports, and DNS/HTTP summary — without uploading to any cloud service.</p>
-        <div class="tool-tags">
-          <span class="tag">PCAP</span><span class="tag">DNS</span><span class="tag">HTTP</span>
-          <span class="tag">Network</span>
-        </div>
-        <span class="tool-link-disabled">
-          <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><rect x="4" y="7" width="8" height="7" rx="1" stroke="currentColor" stroke-width="1.3"/><path d="M6 7V5a2 2 0 014 0v2" stroke="currentColor" stroke-width="1.3"/></svg>
-          In Development
-        </span>
-      </div>
-
-      <!-- Tool 6 — Coming Soon -->
-      <div class="tool-card coming-soon fade-up">
-        <div class="tool-badge-row">
-          <div class="tool-icon green">🧩</div>
-          <span class="soon-pill">COMING SOON</span>
-        </div>
-        <div class="tool-name">Regex IOC Extractor</div>
-        <p class="tool-desc">Paste any text — reports, blogs, emails — and instantly extract all IPs, domains, hashes, CVEs, URLs, and email addresses with one-click copy per category.</p>
-        <div class="tool-tags">
-          <span class="tag">IOC</span><span class="tag">CVE</span><span class="tag">Regex</span>
-          <span class="tag">Extractor</span>
-        </div>
-        <span class="tool-link-disabled">
-          <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><rect x="4" y="7" width="8" height="7" rx="1" stroke="currentColor" stroke-width="1.3"/><path d="M6 7V5a2 2 0 014 0v2" stroke="currentColor" stroke-width="1.3"/></svg>
-          In Development
-        </span>
-      </div>
-
+      <a href="./email-analyser/index.html" class="tool-card fade-up"><div class="tbrow"><div class="ti g">✉️</div><span class="lp"><span class="ld"></span>LIVE</span></div><div class="tn">Email Header Analyser</div><p class="td">Parse raw email headers for phishing indicators, SPF/DKIM/DMARC failures, routing anomalies, malicious URLs, and attachment threats with optional VirusTotal integration.</p><div class="tt"><span class="tag">SPF</span><span class="tag">DKIM</span><span class="tag">DMARC</span><span class="tag">GeoIP</span><span class="tag">URL Scan</span><span class="tag">IOC Extract</span></div><span class="tla"><svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>Launch Tool</span></a>
+      <a href="./log-sanitizer/index.html" class="tool-card fade-up"><div class="tbrow"><div class="ti b">🛡️</div><span class="lp"><span class="ld"></span>LIVE</span></div><div class="tn">SOC Log Sanitizer</div><p class="td">Strip PII, credentials, IPs, usernames, SIDs, MACs and secrets from any log format — Windows Event JSON, Syslog, CEF, Apache — with reversible token mapping.</p><div class="tt"><span class="tag">PII Redact</span><span class="tag">JSON KV</span><span class="tag">Reversible</span><span class="tag">CEF/Syslog</span><span class="tag">GDPR</span></div><span class="tla"><svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>Launch Tool</span></a>
+      <div class="tool-card cs fade-up"><div class="tbrow"><div class="ti p">🔍</div><span class="sp">COMING SOON</span></div><div class="tn">IOC Intelligence Hub</div><p class="td">Bulk lookup IPs, domains, hashes, and URLs against multiple threat intel feeds. Export findings as structured reports.</p><div class="tt"><span class="tag">IP Lookup</span><span class="tag">Hash Check</span><span class="tag">Threat Intel</span></div><span class="tld"><svg width="13" height="13" viewBox="0 0 16 16" fill="none"><rect x="4" y="7" width="8" height="7" rx="1" stroke="currentColor" stroke-width="1.3"/><path d="M6 7V5a2 2 0 014 0v2" stroke="currentColor" stroke-width="1.3"/></svg>In Development</span></div>
+      <div class="tool-card cs fade-up"><div class="tbrow"><div class="ti r">🔐</div><span class="sp">COMING SOON</span></div><div class="tn">Password Audit Tool</div><p class="td">Check password strength, entropy, and breach exposure. All hashing local — passwords never leave the page.</p><div class="tt"><span class="tag">Entropy</span><span class="tag">HIBP Check</span><span class="tag">Local Only</span></div><span class="tld"><svg width="13" height="13" viewBox="0 0 16 16" fill="none"><rect x="4" y="7" width="8" height="7" rx="1" stroke="currentColor" stroke-width="1.3"/><path d="M6 7V5a2 2 0 014 0v2" stroke="currentColor" stroke-width="1.3"/></svg>In Development</span></div>
+      <div class="tool-card cs fade-up"><div class="tbrow"><div class="ti a">📋</div><span class="sp">COMING SOON</span></div><div class="tn">PCAP Quick Analyser</div><p class="td">Upload a .pcap and get instant protocol breakdown, top talkers, suspicious ports and DNS/HTTP summary — no cloud upload required.</p><div class="tt"><span class="tag">PCAP</span><span class="tag">DNS</span><span class="tag">HTTP</span><span class="tag">Network</span></div><span class="tld"><svg width="13" height="13" viewBox="0 0 16 16" fill="none"><rect x="4" y="7" width="8" height="7" rx="1" stroke="currentColor" stroke-width="1.3"/><path d="M6 7V5a2 2 0 014 0v2" stroke="currentColor" stroke-width="1.3"/></svg>In Development</span></div>
+      <div class="tool-card cs fade-up"><div class="tbrow"><div class="ti g">🧩</div><span class="sp">COMING SOON</span></div><div class="tn">Regex IOC Extractor</div><p class="td">Paste any text and extract all IPs, domains, hashes, CVEs, URLs and emails with one-click copy per category.</p><div class="tt"><span class="tag">IOC</span><span class="tag">CVE</span><span class="tag">Regex</span><span class="tag">Extractor</span></div><span class="tld"><svg width="13" height="13" viewBox="0 0 16 16" fill="none"><rect x="4" y="7" width="8" height="7" rx="1" stroke="currentColor" stroke-width="1.3"/><path d="M6 7V5a2 2 0 014 0v2" stroke="currentColor" stroke-width="1.3"/></svg>In Development</span></div>
     </div>
   </div>
 </section>
 
-<!-- ── USER AWARENESS ── -->
+<!-- SERVICES -->
 <section class="services-section" id="awareness">
   <div class="container">
-    <div class="sec-head-row fade-up">
-      <div>
-        <div class="sec-tag">🎓 Stay Safe</div>
-        <h2 class="sec-h2">Our Services</h2>
-        <p class="sec-p">At Cybthreat, we don’t just provide security—we build it. From elite awareness sessions to the engineering of next-gen Zero Trust tools, we are laying the foundation for a safer digital world. Driven by a core team of experts and a community of 500+, our roadmap is clear: to define the future of global cybersecurity.</p>
-      </div>
-    </div>
-    <div class="awareness-grid">
-      <div class="awareness-card fade-up">
-        <div class="aware-icon" style="background:var(--red-bg);border:1px solid rgba(255,77,77,0.2);">🎣</div>
-        <div class="aware-title">Enterprise Security Training</div>
-        <p class="aware-body">We provide high-impact cybersecurity awareness sessions for corporate teams. From live hacking demonstrations to security best-practice workshops, we ensure your employees are your first line of defense.</p>
-        <a href="#" class="aware-link">Read Guide <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></a>
-      </div>
-      <div class="awareness-card fade-up">
-        <div class="aware-icon" style="background:var(--amber-bg);border:1px solid rgba(255,181,71,0.2);">🔑</div>
-        <div class="aware-title">Phishing Simulation & Defense</div>
-        <p class="aware-body">Our team conducts controlled phishing simulations to identify vulnerabilities in your staff's response. We provide actionable data and targeted training to block phishing attempts before they lead to a breach.</p>
-        <a href="#" class="aware-link">Read Guide <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></a>
-      </div>
-      <div class="awareness-card fade-up">
-        <div class="aware-icon" style="background:var(--blue-bg);border:1px solid rgba(77,158,255,0.2);">📱</div>
-        <div class="aware-title">Cybersecurity Consultancy</div>
-        <p class="aware-body">Get professional advice on building a robust security posture. We offer consultancy on security architecture, framework implementation (ISO/SOC2), and long-term risk management strategies.</p>
-        <a href="#" class="aware-link">Read Guide <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></a>
-      </div>
-      <div class="awareness-card fade-up">
-        <div class="aware-icon" style="background:rgba(167,139,250,0.1);border:1px solid rgba(167,139,250,0.2);">💻</div>
-        <div class="aware-title">Open Source Security Tools</div>
-        <p class="aware-body">We develop and maintain free, high-performance cybersecurity tools—like our SOC Log Sanitizer—to help defenders worldwide automate their workflows and secure their logs with ease.</p>
-        <a href="#" class="aware-link">Read Guide <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></a>
-      </div>
-      <div class="awareness-card fade-up">
-        <div class="aware-icon" style="background:var(--accent-dim);border:1px solid rgba(0,229,160,0.2);">🌐</div>
-        <div class="aware-title">Career & Community Hub</div>
-        <p class="aware-body">Beyond services, we host a dedicated job portal and provide seminars to help the next generation of analysts. With a community of 500+ members, we are the heartbeat of the modern cybersecurity ecosystem.</p>
-        <a href="#" class="aware-link">Read Guide <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></a>
-      </div>
+    <div class="sec-head-row fade-up"><div><div class="sec-tag">🛡️ What We Do</div><h2 class="sec-h2">Our Services</h2><p class="sec-p">At Cybthreat, we don't just provide security — we build it. From elite awareness sessions to next-gen Zero Trust tools, we're laying the foundation for a safer digital world. Driven by experts and a community of 500+.</p></div></div>
+    <div class="ag">
+      <div class="ac fade-up"><div class="ai" style="background:var(--red-bg);border:1px solid rgba(255,77,77,.2)">🎯</div><div class="at2">Enterprise Security Training</div><p class="ab2">High-impact cybersecurity awareness sessions for corporate teams. From live hacking demonstrations to best-practice workshops — your employees become your first line of defense.</p><a href="#" class="al">Learn More <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></a></div>
+      <div class="ac fade-up"><div class="ai" style="background:var(--amber-bg);border:1px solid rgba(255,181,71,.2)">🎣</div><div class="at2">Phishing Simulation & Defence</div><p class="ab2">Controlled phishing simulations to identify vulnerabilities in your staff's response. Actionable data and targeted training to block attempts before they become breaches.</p><a href="#" class="al">Learn More <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></a></div>
+      <div class="ac fade-up"><div class="ai" style="background:var(--blue-bg);border:1px solid rgba(77,158,255,.2)">🏛️</div><div class="at2">Cybersecurity Consultancy</div><p class="ab2">Professional advice on building a robust security posture. Consultancy on architecture, ISO 27001 / SOC2 implementation, and long-term risk management strategies.</p><a href="#" class="al">Learn More <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></a></div>
+      <div class="ac fade-up"><div class="ai" style="background:rgba(167,139,250,.1);border:1px solid rgba(167,139,250,.2)">💻</div><div class="at2">Open Source Security Tools</div><p class="ab2">We develop and maintain free, high-performance cybersecurity tools to help defenders worldwide automate their workflows — at zero cost.</p><a href="#tools" class="al">View Tools <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></a></div>
+      <div class="ac fade-up"><div class="ai" style="background:var(--accent-dim);border:1px solid rgba(0,229,160,.2)">🌐</div><div class="at2">Career & Community Hub</div><p class="ab2">We host a dedicated job portal and provide seminars to help the next generation of analysts. With 500+ members, we're the heartbeat of the modern cybersecurity ecosystem.</p><a href="./job-portal/index.html" class="al">Visit Job Portal <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></a></div>
     </div>
   </div>
 </section>
 
-<!-- ── ROADMAP ── -->
-<section class="future-section" id="roadmap">
-  <div class="container">
-    <div class="sec-head-row fade-up">
-      <div>
-        <div class="sec-tag">🚀 Where We're Headed</div>
-        <h2 class="sec-h2">The Cybthreat Roadmap</h2>
-        <p class="sec-p">We're growing from a toolbox into a full cybersecurity services platform. Here's what's coming.</p>
-      </div>
-    </div>
-    <div class="roadmap-grid">
-      <div class="roadmap-card fade-up">
-        <div class="rm-phase">Phase 1 · Now</div>
-        <div class="rm-title">Free Client-Side Tools</div>
-        <p class="rm-body">Open-source, zero-server security tools that privacy-first analysts can use without worrying about data leakage. Community-built and community-maintained.</p>
-        <div class="rm-tags">
-          <span class="rm-tag">Email Analyser</span>
-          <span class="rm-tag">Log Sanitizer</span>
-          <span class="rm-tag">Open Source</span>
-        </div>
-      </div>
-      <div class="roadmap-card blue fade-up">
-        <div class="rm-phase">Phase 2 · Near Future</div>
-        <div class="rm-title">SOC-as-a-Service Platform</div>
-        <p class="rm-body">A managed Security Operations Centre offering 24/7 monitoring, alert triage, and incident response for SMEs who can't afford a full in-house team.</p>
-        <div class="rm-tags">
-          <span class="rm-tag">24/7 Monitoring</span>
-          <span class="rm-tag">Alert Triage</span>
-          <span class="rm-tag">SIEM Integration</span>
-        </div>
-      </div>
-      <div class="roadmap-card red fade-up">
-        <div class="rm-phase">Phase 3 · Mid-term</div>
-        <div class="rm-title">VAPT & Red Team Services</div>
-        <p class="rm-body">Vulnerability Assessment and Penetration Testing across web applications, APIs, internal networks, and cloud environments — with actionable remediation reports.</p>
-        <div class="rm-tags">
-          <span class="rm-tag">Web App Pentesting</span>
-          <span class="rm-tag">API Security</span>
-          <span class="rm-tag">Cloud VAPT</span>
-          <span class="rm-tag">Red Teaming</span>
-        </div>
-      </div>
-      <div class="roadmap-card purple fade-up">
-        <div class="rm-phase">Phase 4 · Vision</div>
-        <div class="rm-title">Email Threat Intelligence Service</div>
-        <p class="rm-body">A full-stack email security managed service — real-time threat feeds, custom YARA rules, business email compromise detection, and executive protection programmes.</p>
-        <div class="rm-tags">
-          <span class="rm-tag">BEC Detection</span>
-          <span class="rm-tag">Threat Feeds</span>
-          <span class="rm-tag">YARA Rules</span>
-          <span class="rm-tag">Exec Protection</span>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ── TEAM ── -->
+<!-- TEAM -->
 <section class="team-section" id="team">
   <div class="container">
-    <div class="sec-head-row fade-up">
-      <div>
-        <div class="sec-tag">👥 The People</div>
-        <h2 class="sec-h2">Meet the Team</h2>
-        <p class="sec-p">10+ security researchers, analysts, and developers united by one mission: making the internet safer for everyone.</p>
-      </div>
+    <div class="sec-head-row fade-up"><div><div class="sec-tag">👥 The People</div><h2 class="sec-h2">Meet the Team</h2><p class="sec-p">10+ security researchers, analysts, and developers united by one mission — making the internet safer for everyone.</p></div></div>
+    <div class="tf fade-up">
+      <div class="fa">AA</div>
+      <div><div class="fr">Founder & Lead</div><div class="fn">Ali Ayman</div><p class="fb">Ali founded Cybthreat with a vision to democratise access to professional-grade security tooling. A SOC analyst and security researcher, he leads a growing team of 10+ members actively building tools and knowledge resources to protect organisations of all sizes from evolving cyber threats.</p></div>
     </div>
-
-    <!-- Founder -->
-    <div class="team-founder fade-up">
-      <div class="founder-avatar">AA</div>
-      <div>
-        <div class="founder-role">Founder & Lead</div>
-        <div class="founder-name">Ali Ayman</div>
-        <p class="founder-bio">Ali founded Cybthreat with a vision to democratise access to professional-grade security tooling. A SOC analyst and security researcher, he leads a growing team of 10+ members actively building tools and knowledge resources to protect organisations of all sizes from evolving cyber threats.</p>
-      </div>
-    </div>
-
-    <!-- Team members -->
-    <div class="team-grid fade-up">
-      <div class="team-card">
-        <div class="team-avatar" style="color:var(--accent)">T1</div>
-        <div class="team-member-name">Archana Suresh</div>
-        <div class="team-member-role">Threat Hunter</div>
-      </div>
-      <div class="team-card">
-        <div class="team-avatar" style="color:var(--blue)">T2</div>
-        <div class="team-member-name">Amal Joseph</div>
-        <div class="team-member-role">Security Researcher</div>
-      </div>
-      <div class="team-card">
-        <div class="team-avatar" style="color:var(--purple)">T3</div>
-        <div class="team-member-name">Mahija MS</div>
-        <div class="team-member-role">Digital Forensics & Automation</div>
-      </div>
-      <div class="team-card">
-        <div class="team-avatar" style="color:var(--amber)">T4</div>
-        <div class="team-member-name">Ameer Bin Abdul Latheef</div>
-        <div class="team-member-role">Email Security & Anti-Phishing</div>
-      </div>
-      <div class="team-card">
-        <div class="team-avatar" style="color:var(--red)">T5</div>
-        <div class="team-member-name">Sanjay Sanil</div>
-        <div class="team-member-role">Developer</div>
-      </div>
-      <div class="team-card">
-        <div class="team-avatar" style="color:var(--accent)">T6</div>
-        <div class="team-member-name">Faheem K</div>
-        <div class="team-member-role">Security Consultant (Offensive & GRC)</div>
-      </div>
-      <div class="team-card">
-        <div class="team-avatar" style="color:var(--blue)">T7</div>
-        <div class="team-member-name">Muhammed Waseem Villan</div>
-        <div class="team-member-role">Expert (Forensics & Ethical Hacking)</div>
-      </div>
-      <div class="team-card">
-        <div class="team-avatar" style="color:var(--purple)">T8</div>
-        <div class="team-member-name">Researcher</div>
-        <div class="team-member-role">OSINT & Recon</div>
-      </div>
-      <div class="team-card">
-        <div class="team-avatar" style="color:var(--amber)">T9</div>
-        <div class="team-member-name">Analyst</div>
-        <div class="team-member-role">Log Analysis</div>
-      </div>
-      <div class="team-card" style="border-style:dashed;cursor:pointer">
-        <div class="team-avatar" style="color:var(--text3);font-size:24px;border-style:dashed">+</div>
-        <div class="team-member-name" style="color:var(--text3)">You?</div>
-        <div class="team-member-role">Join the Team</div>
-      </div>
+    <div class="tg fade-up">
+      <div class="tc"><div class="tav" style="color:var(--accent)">AS</div><div class="tmn">Archana Suresh</div><div class="tmr">Threat Hunter</div></div>
+      <div class="tc"><div class="tav" style="color:var(--blue)">AJ</div><div class="tmn">Amal Joseph</div><div class="tmr">Security Researcher</div></div>
+      <div class="tc"><div class="tav" style="color:var(--purple)">MM</div><div class="tmn">Mahija MS</div><div class="tmr">Forensics & Automation</div></div>
+      <div class="tc"><div class="tav" style="color:var(--amber)">AB</div><div class="tmn">Ameer Bin Abdul Latheef</div><div class="tmr">Email Security & Anti-Phishing</div></div>
+      <div class="tc"><div class="tav" style="color:var(--red)">SS</div><div class="tmn">Sanjay Sanil</div><div class="tmr">Developer</div></div>
+      <div class="tc"><div class="tav" style="color:var(--accent)">FK</div><div class="tmn">Faheem K</div><div class="tmr">Security Consultant (Offensive & GRC)</div></div>
+      <div class="tc"><div class="tav" style="color:var(--blue)">MW</div><div class="tmn">Muhammed Waseem Villan</div><div class="tmr">Forensics & Ethical Hacking</div></div>
+      <div class="tc"><div class="tav" style="color:var(--purple)">R8</div><div class="tmn">Researcher</div><div class="tmr">OSINT & Recon</div></div>
+      <div class="tc"><div class="tav" style="color:var(--amber)">A9</div><div class="tmn">Analyst</div><div class="tmr">Log Analysis</div></div>
+      <div class="tc" style="border-style:dashed;cursor:pointer" onclick="window.location.href='./job-portal/index.html'"><div class="tav" style="color:var(--text3);font-size:22px;border-style:dashed">+</div><div class="tmn" style="color:var(--text3)">You?</div><div class="tmr">Join the Team</div></div>
     </div>
   </div>
 </section>
 
-<!-- ── CTA ── -->
+<!-- CTA -->
 <section class="cta-section">
-  <div class="container">
-    <div class="cta-inner fade-up">
-      <h2 class="cta-h2">Start Protecting Your<br/><span style="color:var(--accent)">Environment Today</span></h2>
-      <div class="cta-btns">
-        <a href="#tools" class="btn-primary">
-          <svg width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M8 2v8M5 8l3 3 3-3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><rect x="2" y="12" width="12" height="2" rx="1" fill="currentColor"/></svg>
-          Launch a Free Tool
-        </a>
-        <a href="https://github.com/aymnmax" target="_blank" class="btn-outline">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.477 2 2 6.477 2 12c0 4.418 2.865 8.166 6.839 9.489.5.092.682-.217.682-.482 0-.237-.008-.866-.013-1.7-2.782.604-3.369-1.34-3.369-1.34-.454-1.156-1.11-1.463-1.11-1.463-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.578 9.578 0 0112 6.836c.85.004 1.705.114 2.504.336 1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.202 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.743 0 .267.18.578.688.48C19.138 20.163 22 16.418 22 12c0-5.523-4.477-10-10-10z"/></svg>
-          View on GitHub
-        </a>
-      </div>
+  <div class="container"><div class="cta-inner fade-up">
+    <h2 class="cta-h2">Start Protecting Your<br/><span style="color:var(--accent)">Environment Today</span></h2>
+    <p class="cta-p">All tools are free, open-source, and work entirely in your browser. No account needed.</p>
+    <div class="cta-btns">
+      <a href="#tools" class="btn-primary"><svg width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M8 2v8M5 8l3 3 3-3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><rect x="2" y="12" width="12" height="2" rx="1" fill="currentColor"/></svg>Launch a Free Tool</a>
+      <a href="https://github.com/aymnmax" target="_blank" class="btn-outline"><svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.477 2 2 6.477 2 12c0 4.418 2.865 8.166 6.839 9.489.5.092.682-.217.682-.482 0-.237-.008-.866-.013-1.7-2.782.604-3.369-1.34-3.369-1.34-.454-1.156-1.11-1.463-1.11-1.463-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.578 9.578 0 0112 6.836c.85.004 1.705.114 2.504.336 1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.202 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.743 0 .267.18.578.688.48C19.138 20.163 22 16.418 22 12c0-5.523-4.477-10-10-10z"/></svg>View on GitHub</a>
     </div>
-  </div>
+  </div></div>
 </section>
 
-<!-- ── FOOTER ── -->
+<!-- FOOTER -->
 <footer>
   <div class="container">
-    <div class="footer-inner">
-      <div class="footer-brand">
-        <a href="#" class="logo" style="margin-bottom:12px;display:inline-flex">
-          <span class="logo-shield"><svg width="22" height="22" viewBox="0 0 26 26" fill="none"><path d="M13 2L3 6v7c0 5.5 4.3 10.7 10 12 5.7-1.3 10-6.5 10-12V6L13 2z" stroke="currentColor" stroke-width="1.6" fill="rgba(0,229,160,0.08)"/><path d="M9 13l3 3 5-5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-          <span class="logo-name">Cybthreat</span>
-        </a>
-        <p class="footer-tagline">An open-source security team building free tools and knowledge to defend the digital world.</p>
-      </div>
-      <div>
-        <div class="footer-col-title">Tools</div>
-        <div class="footer-links">
-          <a href="./email-analyser/index.html" class="footer-link">Email Header Analyser</a>
-          <a href="./log-sanitizer/index.html" class="footer-link">SOC Log Sanitizer</a>
-          <a href="#tools" class="footer-link">IOC Intelligence Hub (soon)</a>
-          <a href="#tools" class="footer-link">Password Audit Tool (soon)</a>
-        </div>
-      </div>
-      <div>
-        <div class="footer-col-title">Resources</div>
-        <div class="footer-links">
-          <a href="#awareness" class="footer-link">Phishing Awareness</a>
-          <a href="#awareness" class="footer-link">Password Hygiene</a>
-          <a href="#awareness" class="footer-link">Incident Response 101</a>
-          <a href="https://github.com/aymnmax" target="_blank" class="footer-link">GitHub →</a>
-        </div>
-      </div>
+    <div class="fi">
+      <div><a href="#" class="logo" style="margin-bottom:12px;display:inline-flex"><span class="logo-shield"><svg width="22" height="22" viewBox="0 0 26 26" fill="none"><path d="M13 2L3 6v7c0 5.5 4.3 10.7 10 12 5.7-1.3 10-6.5 10-12V6L13 2z" stroke="currentColor" stroke-width="1.6" fill="rgba(0,229,160,0.08)"/><path d="M9 13l3 3 5-5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="logo-name">Cybthreat</span></a><p class="ft">An open-source security team building free tools and knowledge to defend the digital world.</p></div>
+      <div><div class="fct">Tools</div><div class="fl"><a href="./email-analyser/index.html" class="fla">Email Header Analyser</a><a href="./log-sanitizer/index.html" class="fla">SOC Log Sanitizer</a><a href="#tools" class="fla">IOC Intelligence Hub (soon)</a><a href="#tools" class="fla">Password Audit Tool (soon)</a></div></div>
+      <div><div class="fct">Company</div><div class="fl"><a href="#awareness" class="fla">Our Services</a><a href="#team" class="fla">Meet the Team</a><a href="./job-portal/index.html" class="fla">Job Portal</a><a href="./threat-news/index.html" class="fla">Threat Intel Feed</a><a href="https://github.com/aymnmax" target="_blank" class="fla">GitHub →</a></div></div>
     </div>
-    <div class="footer-bottom">
-      <span class="footer-copy">© 2024 Cybthreat · Founded by Ali Ayman · All tools MIT licensed</span>
-      <span class="footer-love">Built with <span>♥</span> by 10+ researchers — defending the digital world</span>
-    </div>
+    <div class="fb2"><span class="fc">© 2025 Cybthreat · Founded by Ali Ayman · All tools MIT licensed</span><span class="flv">Built with <span>♥</span> by 10+ researchers — defending the digital world</span></div>
   </div>
 </footer>
 
 <script>
-  // Scroll-triggered fade-up animation
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach((entry, i) => {
-      if (entry.isIntersecting) {
-        setTimeout(() => entry.target.classList.add('visible'), i * 80);
-        observer.unobserve(entry.target);
-      }
-    });
-  }, { threshold: 0.1 });
-  document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
+  // Fade up on scroll
+  const obs = new IntersectionObserver(entries => entries.forEach(e => { if(e.isIntersecting){e.target.classList.add('visible');obs.unobserve(e.target)} }), {threshold:.08});
+  document.querySelectorAll('.fade-up').forEach(el => obs.observe(el));
+  document.querySelectorAll('.tools-grid,.ag,.tg').forEach(g => g.querySelectorAll('.fade-up').forEach((c,i) => c.style.transitionDelay=i*55+'ms'));
 
-  // Stagger children within grids
-  document.querySelectorAll('.tools-grid, .awareness-grid, .roadmap-grid, .team-grid').forEach(grid => {
-    grid.querySelectorAll('.fade-up').forEach((card, i) => {
-      card.style.transitionDelay = `${i * 60}ms`;
-    });
-  });
+  // Hamburger
+  const hb=document.getElementById('hamburger'), mm=document.getElementById('mobileMenu');
+  hb.addEventListener('click',()=>{ hb.classList.toggle('open'); mm.classList.toggle('open'); document.body.style.overflow=mm.classList.contains('open')?'hidden':''; });
+  function closeMobileMenu(){ hb.classList.remove('open'); mm.classList.remove('open'); document.body.style.overflow=''; }
+  document.addEventListener('click',e=>{ if(mm.classList.contains('open')&&!mm.contains(e.target)&&!hb.contains(e.target)) closeMobileMenu(); });
+
+  // TV clock
+  function tick(){ const n=new Date(); document.getElementById('tvClock').textContent=n.toUTCString().slice(17,25)+' UTC'; document.getElementById('liveTime').textContent='LIVE · '+n.toUTCString().slice(5,16); }
+  tick(); setInterval(tick,1000);
+
+  // Rotating headlines
+  const news=[
+    {h:'Critical Zero-Day in Windows CLFS Driver Actively Exploited by Nation-State Actor',b:'CVE-2024-49138 · CVSS 9.8 · SYSTEM privilege escalation via heap overflow. Emergency patch available.',s:'● CRITICAL',c:'sev-critical'},
+    {h:'Ivanti Connect Secure Zero-Day Used in Widespread Government Network Attacks',b:'CVE-2025-0282 · CVSS 9.0 · Unauthenticated RCE exploited before patch release. CISA issues emergency directive.',s:'● CRITICAL',c:'sev-critical'},
+    {h:'Lazarus Group Deploys New MagicRAT Variant Targeting Defence Contractors',b:'North Korean threat actor uses LinkedIn lures to deliver upgraded RAT with advanced anti-sandbox evasion.',s:'● HIGH',c:'sev-high'},
+    {h:'PhaaS Platform Rockstar2FA Returns with Advanced 2FA Bypass Techniques',b:'Adversary-in-the-middle platform resurfaces targeting Microsoft 365 and Google Workspace accounts.',s:'● HIGH',c:'sev-high'},
+    {h:'New Python Infostealer Distributed via 40+ Malicious PyPI Packages',b:'Packages exfiltrating credentials, crypto wallets, and browser data from developer machines globally.',s:'● MEDIUM',c:'sev-medium'},
+  ];
+  let cur=0;
+  setInterval(()=>{
+    cur=(cur+1)%news.length;
+    const item=news[cur];
+    const h=document.getElementById('newsHeadline'),b=document.getElementById('newsBody'),s=document.getElementById('newsSeverity');
+    h.style.opacity=b.style.opacity=s.style.opacity='0';
+    setTimeout(()=>{ h.textContent=item.h; b.textContent=item.b; s.textContent=item.s; s.className='tv-news-severity '+item.c; h.style.opacity=b.style.opacity=s.style.opacity='1'; },400);
+  },5500);
 </script>
 </body>
 </html>
