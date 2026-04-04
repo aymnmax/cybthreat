@@ -73,6 +73,26 @@ body { background: var(--bg); color: var(--text); font-family: var(--font-main);
 .t-prompt{color:var(--accent)} .t-cmd{color:var(--text)} .t-out{color:var(--text2)} .t-warn{color:var(--amber)} .t-ok{color:var(--green);font-weight:500}
 .t-cursor { color:var(--accent); animation:blink 1s step-end infinite; }
 
+.nav-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background-color: transparent;
+  color: #a0a0b0; /* Light grayish text */
+  border: 1px solid #333; /* Subtle border */
+  border-radius: 8px;
+  text-decoration: none;
+  font-family: sans-serif;
+  transition: all 0.2s ease;
+}
+
+.nav-back:hover {
+  background-color: #1a1a1a;
+  color: #ffffff;
+  border-color: #555;
+}
+
 /* ─── Container ────────────────────────────────────────────────────── */
 .container { max-width:1200px; margin:0 auto; padding:0 24px; }
 .sanitizer-section { padding:60px 0 80px; background:linear-gradient(180deg,var(--bg) 0%,var(--bg2) 100%); }
