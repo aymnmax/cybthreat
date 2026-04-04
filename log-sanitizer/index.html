@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cybthreat — SOC Log Sanitizer</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet" />
+</head>
+<body>
+  <div class="scanline"></div>
+
+  <!-- HEADER -->
+  <header class="site-header">
+    <div class="header-inner">
+      <a href="#" class="logo">
+        <span class="logo-icon">
+          <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+            <rect x="1" y="4" width="20" height="14" rx="2" stroke="currentColor" stroke-width="1.5"/>
+            <path d="M1 7l10 6 10-6" stroke="currentColor" stroke-width="1.5"/>
+            <rect x="14" y="11" width="7" height="7" rx="1.5" fill="var(--accent)" stroke="var(--bg)" stroke-width="0.5"/>
+            <path d="M16 14.5l1 1 2.5-2.5" stroke="var(--bg)" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </span>
+        <span class="logo-text">Cybthreat</span>
+        <span class="logo-badge">Log Sanitizer</span>
+      </a>
+      <nav class="nav">
+        <a href="#sanitizer" class="nav-link active">Sanitizer</a>
+        <a href="#about" class="nav-link">About</a>
+        <a href="https://github.com/aymnmax/log-sanitizer" target="_blank" class="nav-link nav-github">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.477 2 2 6.477 2 12c0 4.418 2.865 8.166 6.839 9.489.5.092.682-.217.682-.482 0-.237-.008-.866-.013-1.7-2.782.604-3.369-1.34-3.369-1.34-.454-1.156-1.11-1.463-1.11-1.463-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.578 9.578 0 0112 6.836c.85.004 1.705.114 2.504.336 1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.202 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.743 0 .267.18.578.688.48C19.138 20.163 22 16.418 22 12c0-5.523-4.477-10-10-10z"/></svg>
+          GitHub
+        </a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-grid-bg"></div>
+    <div class="hero-content">
+      <div class="hero-tag">
+        <span class="blink-dot"></span>
+        Zero-Knowledge Architecture · 100% Client-Side · No data leaves your browser
+      </div>
+      <h1 class="hero-title">SOC Log<br/><span class="accent-text">Sanitizer</span></h1>
+      <p class="hero-sub">Strip PII, credentials, and network identifiers from Windows Event logs, JSON, Syslog, CEF, LEEF, and any raw log format — safely and reversibly, entirely in your browser.</p>
+      <div class="hero-stats">
+        <div class="hstat"><span class="hstat-n">12+</span><span class="hstat-l">Rule Types</span></div>
+        <div class="hstat-div"></div>
+        <div class="hstat"><span class="hstat-n">JSON</span><span class="hstat-l">KV Parse</span></div>
+        <div class="hstat-div"></div>
+        <div class="hstat"><span class="hstat-n">REV</span><span class="hstat-l">Reversible</span></div>
+        <div class="hstat-div"></div>
+        <div class="hstat"><span class="hstat-n">CEF</span><span class="hstat-l">Syslog</span></div>
+        <div class="hstat-div"></div>
+        <div class="hstat"><span class="hstat-n">PII</span><span class="hstat-l">GDPR Safe</span></div>
+      </div>
+    </div>
+    <div class="hero-terminal">
+      <div class="terminal-bar">
+        <span class="t-dot red"></span><span class="t-dot yellow"></span><span class="t-dot green"></span>
+        <span class="t-title">cybthreat-sanitizer v2.0 ~ terminal</span>
+      </div>
+      <div class="terminal-body">
+        <div class="t-line"><span class="t-prompt">$</span> <span class="t-cmd">sanitizer --deep --reversible event.log</span></div>
+        <div class="t-line t-out">[+] Parsing 342 log lines...</div>
+        <div class="t-line t-out">[+] Detected format: Windows Event JSON</div>
+        <div class="t-line t-warn">[!] 3 credentials in JSON fields → [KEY_1..3]</div>
+        <div class="t-line t-warn">[!] 7 usernames detected → [USER_1..7]</div>
+        <div class="t-line t-out">[+] 12 IPs redacted → [IP_1..12]</div>
+        <div class="t-line t-out">[+] 4 hostnames → [HOST_1..4]</div>
+        <div class="t-line t-out">[+] 2 SIDs → [SID_1..2]</div>
+        <div class="t-line t-out">&nbsp;</div>
+        <div class="t-line t-ok">✓ 28 items sanitized — mapping saved</div>
+        <div class="t-line"><span class="t-cursor">█</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- MAIN SANITIZER -->
+  <main id="sanitizer" class="sanitizer-section">
+    <div class="container">
+      <div class="section-header">
+        <h2 class="section-title">Log Sanitizer</h2>
+        <p class="section-sub">Paste raw logs, upload a file, or drag and drop — any format supported</p>
+      </div>
+
+      <!-- RULES BAR -->
+      <div class="rules-bar">
+        <div class="rules-bar-header">
+          <div class="rules-title">
+            <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><rect x="1" y="1" width="14" height="14" rx="2" stroke="currentColor" stroke-width="1.2"/><path d="M4 5h8M4 8h5M4 11h6" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+            Active Detection Rules
+          </div>
+          <span style="font-family:var(--font-mono);font-size:11px;color:var(--text3)">Click to toggle</span>
+        </div>
+        <div class="rules-grid">
+          <span class="rule-chip active-ip"    onclick="toggleRule('ip',this)"><span class="chip-dot"></span>IPv4 / IPv6</span>
+          <span class="rule-chip active-email" onclick="toggleRule('email',this)"><span class="chip-dot"></span>Email</span>
+          <span class="rule-chip active-host"  onclick="toggleRule('host',this)"><span class="chip-dot"></span>Hostname</span>
+          <span class="rule-chip active-user"  onclick="toggleRule('user',this)"><span class="chip-dot"></span>Username</span>
+          <span class="rule-chip active-sid"   onclick="toggleRule('sid',this)"><span class="chip-dot"></span>Windows SID</span>
+          <span class="rule-chip active-token" onclick="toggleRule('token',this)"><span class="chip-dot"></span>JWT / Token</span>
+          <span class="rule-chip active-path"  onclick="toggleRule('path',this)"><span class="chip-dot"></span>File Path</span>
+          <span class="rule-chip active-uuid"  onclick="toggleRule('uuid',this)"><span class="chip-dot"></span>UUID / GUID</span>
+          <span class="rule-chip active-mac"   onclick="toggleRule('mac',this)"><span class="chip-dot"></span>MAC Address</span>
+          <span class="rule-chip active-phone" onclick="toggleRule('phone',this)"><span class="chip-dot"></span>Phone</span>
+          <span class="rule-chip active-key"   onclick="toggleRule('key',this)"><span class="chip-dot"></span>API Key / Password</span>
+          <span class="rule-chip active-email" onclick="toggleRule('json',this)"><span class="chip-dot"></span>JSON / KV Fields</span>
+        </div>
+      </div>
+
+      <!-- I/O GRID -->
+      <div class="io-grid">
+        <!-- INPUT -->
+        <div class="io-panel">
+          <div class="io-toolbar">
+            <span class="io-label">
+              <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><rect x="1" y="2" width="14" height="10" rx="1.5" stroke="currentColor" stroke-width="1.2"/><path d="M5 12v2M11 12v2M3 14h10" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+              Raw Logs
+            </span>
+            <div class="toolbar-btns">
+              <input type="file" id="logFileInput" accept=".log,.txt,.json,.xml,.csv,.evtx" style="display:none" onchange="handleFileUpload(event)" />
+              <button class="tbtn tbtn-upload" onclick="document.getElementById('logFileInput').click()">
+                <svg width="13" height="13" viewBox="0 0 16 16" fill="none">
+                  <path d="M8 2v8M5 5L8 2l3 3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+                  <path d="M2 11v1a2 2 0 002 2h8a2 2 0 002-2v-1" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+                </svg>
+                Upload Log
+              </button>
+              <button class="tbtn tbtn-clear" onclick="clearAll()">Clear</button>
+            </div>
+          </div>
+
+          <div class="drop-zone" id="dropZone">
+            <svg width="16" height="16" viewBox="0 0 20 20" fill="none">
+              <path d="M10 3v9M7 6L10 3l3 3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M3 13v2a2 2 0 002 2h10a2 2 0 002-2v-2" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+            </svg>
+            Drop any log file here (.log, .txt, .json, .xml)
+          </div>
+
+          <textarea id="rawInput" class="io-textarea" spellcheck="false" placeholder="Paste logs here — any format works:
+
+Windows Event Log (JSON):
+{&quot;EventID&quot;:4624,&quot;TargetUserName&quot;:&quot;john.doe&quot;,&quot;IpAddress&quot;:&quot;192.168.1.55&quot;}
+
+Syslog:
+Jan 12 10:23:44 server01 sshd[1234]: Accepted password for admin from 10.0.0.1
+
+CEF:
+CEF:0|Vendor|App|1.0|100|Login|5|src=10.0.0.1 suser=jdoe
+
+Apache / Nginx:
+10.0.0.1 - admin [12/Jan/2024] &quot;GET /api HTTP/1.1&quot; 200"></textarea>
+
+          <div class="io-footer">
+            <span class="io-hint hidden" id="file-badge">
+              <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><rect x="2" y="1" width="12" height="14" rx="2" stroke="currentColor" stroke-width="1.2"/><path d="M5 5h6M5 8h6M5 11h4" stroke="currentColor" stroke-width="1.1" stroke-linecap="round"/></svg>
+              <span id="file-badge-name">file loaded</span>
+            </span>
+            <span class="io-hint" style="margin-left:auto">
+              <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><rect x="2" y="4" width="12" height="9" rx="1.5" stroke="currentColor" stroke-width="1.2"/><path d="M5 4V3a3 3 0 016 0v1" stroke="currentColor" stroke-width="1.2"/></svg>
+              All processing is client-side — no data sent anywhere
+            </span>
+          </div>
+        </div>
+
+        <!-- CENTER CONTROLS -->
+        <div class="io-controls">
+          <button class="sanitize-btn" onclick="sanitizeLog()" id="sanitizeBtn">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+            </svg>
+            <span>SCRUB</span>
+          </button>
+          <button class="restore-btn" onclick="restoreAll()">↩ Restore All</button>
+        </div>
+
+        <!-- OUTPUT -->
+        <div class="io-panel">
+          <div class="io-toolbar">
+            <span class="io-label">
+              <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M9 2L2 5v4c0 4 3.1 7.5 7 8.5C13 16.5 16 13 16 9V5L9 2z" stroke="currentColor" stroke-width="1.2"/></svg>
+              Sanitized Output
+            </span>
+            <div class="toolbar-btns">
+              <button class="tbtn tbtn-copy" onclick="copyOutput()">
+                <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><rect x="5" y="5" width="9" height="9" rx="1.5" stroke="currentColor" stroke-width="1.2"/><path d="M11 5V3a1 1 0 00-1-1H3a1 1 0 00-1 1v7a1 1 0 001 1h2" stroke="currentColor" stroke-width="1.2"/></svg>
+                Copy
+              </button>
+              <button class="tbtn" onclick="downloadOutput()">
+                <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M8 2v8M5 8l3 3 3-3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M2 13h12" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+                Download
+              </button>
+            </div>
+          </div>
+
+          <textarea id="safeOutput" class="io-textarea" readonly spellcheck="false" placeholder="Sanitized logs appear here...
+
+Tokens like [IP_1], [USER_2], [KEY_1] replace sensitive data.
+Each token is unique and reversible via the Mapping tab below."></textarea>
+
+          <div class="io-footer">
+            <span class="io-hint" id="output-hint">Ready to sanitize</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- STATS BAR -->
+      <div class="stats-bar" id="statsBar" style="display:none">
+        <div class="stat-card">
+          <div class="stat-num" id="s-total">0</div>
+          <div class="stat-lbl">Total Redacted</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num" id="s-unique">0</div>
+          <div class="stat-lbl">Unique Values</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num" id="s-ips">0</div>
+          <div class="stat-lbl">IP Addresses</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num" id="s-emails">0</div>
+          <div class="stat-lbl">Emails</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num" id="s-users">0</div>
+          <div class="stat-lbl">Usernames</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num" id="s-keys">0</div>
+          <div class="stat-lbl">Secrets / Keys</div>
+        </div>
+      </div>
+
+      <!-- RESULTS SECTION -->
+      <div id="results" class="results hidden">
+        <div class="tabs-bar">
+          <button class="tab active" onclick="switchTab(this,'findings')">
+            Findings <span class="tab-badge warn" id="tab-badge-findings">0</span>
+          </button>
+          <button class="tab" onclick="switchTab(this,'mappings')">
+            Mapping Table <span class="tab-badge" id="tab-badge-mappings">0</span>
+          </button>
+          <button class="tab" onclick="switchTab(this,'diff')">Token Diff View</button>
+        </div>
+
+        <!-- Tab: Findings -->
+        <div id="tab-findings" class="tab-pane">
+          <div id="findings-list"></div>
+        </div>
+
+        <!-- Tab: Mappings -->
+        <div id="tab-mappings" class="tab-pane hidden">
+          <div class="card">
+            <div class="card-title">
+              <span style="display:flex;align-items:center;gap:8px">
+                <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><rect x="1" y="2" width="14" height="12" rx="2" stroke="currentColor" stroke-width="1.2"/><path d="M4 6h8M4 10h5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+                Data Mapping — Original → Token
+              </span>
+              <button class="tbtn" onclick="exportMappingCSV()" style="font-size:11px;padding:3px 10px">Export CSV</button>
+            </div>
+            <div style="margin-bottom:12px;display:flex;flex-wrap:wrap;gap:6px" id="type-filter-bar"></div>
+            <div class="mapping-wrap">
+              <table class="mapping-table">
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>Original Value</th>
+                    <th>Token</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody id="mapping-tbody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tab: Diff -->
+        <div id="tab-diff" class="tab-pane hidden">
+          <div class="card">
+            <div class="card-title">Token Diff — Sanitized Output with Highlighted Tokens</div>
+            <div class="diff-wrap" id="diff-view"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- ABOUT -->
+  <section id="about" class="about-section">
+    <div class="container">
+      <div class="about-grid">
+        <div class="about-col">
+          <h2 class="about-title">Built for SOC & IR Teams</h2>
+          <p class="about-body">Cybthreat Log Sanitizer v2 is a zero-dependency, fully client-side tool for stripping PII and sensitive identifiers from any log format before sharing with vendors, AI tools, or external analysts.</p>
+          <p class="about-body">Every redaction is reversible. The token-to-original mapping stays in your browser — restore individual values or all at once without sending anything to a server.</p>
+        </div>
+        <div class="about-features">
+          <div class="feat"><div class="feat-icon"><svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M9 2L2 5v4c0 4 3.1 7.5 7 8.5C13 16.5 16 13 16 9V5L9 2z" stroke="currentColor" stroke-width="1.4"/></svg></div><div><div class="feat-title">12+ Detection Rules</div><div class="feat-body">IPs, emails, usernames, SIDs, UUIDs, MACs, paths, JWTs, API keys, and more</div></div></div>
+          <div class="feat"><div class="feat-icon"><svg width="18" height="18" viewBox="0 0 18 18" fill="none"><rect x="2" y="2" width="14" height="14" rx="2" stroke="currentColor" stroke-width="1.4"/><path d="M5 7h8M5 11h5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg></div><div><div class="feat-title">Smart JSON / KV Parsing</div><div class="feat-body">Field-aware redaction for structured logs — targets values by key name context</div></div></div>
+          <div class="feat"><div class="feat-icon"><svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M9 2v4M9 12v4M2 9h4M12 9h4M4.2 4.2l2.8 2.8M11 11l2.8 2.8M4.2 13.8l2.8-2.8M11 7 13.8 4.2" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg></div><div><div class="feat-title">Reversible Tokens</div><div class="feat-body">Every [IP_1], [USER_2] maps back — restore selectively or all at once</div></div></div>
+          <div class="feat"><div class="feat-icon"><svg width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="7" stroke="currentColor" stroke-width="1.4"/><path d="M6 9l2 2 4-4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div><div class="feat-title">Multi-Format Support</div><div class="feat-body">Windows Event JSON, Syslog, CEF, LEEF, Apache, Nginx, raw text — anything</div></div></div>
+          <div class="feat"><div class="feat-icon"><svg width="18" height="18" viewBox="0 0 18 18" fill="none"><rect x="2" y="4" width="14" height="11" rx="1.5" stroke="currentColor" stroke-width="1.4"/><path d="M6 4V3a3 3 0 016 0v1" stroke="currentColor" stroke-width="1.4"/></svg></div><div><div class="feat-title">Zero Data Egress</div><div class="feat-body">100% client-side. No server, no telemetry, no storage. GDPR-safe by design.</div></div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <span class="footer-logo">Cybthreat Log Sanitizer v2</span>
+      <span class="footer-note">Client-side only · Reversible tokens · No telemetry</span>
+    </div>
+  </footer>
+
+  <script src="sanitizer.js"></script>
+  <script>
+    // Wire up stats bar visibility and file badge name
+    const _orig = window.sanitizeLog;
+    window.sanitizeLog = function() {
+      _orig();
+      document.getElementById('statsBar').style.display = 'grid';
+    };
+
+    // File badge display
+    const _orig2 = window.handleFileUpload;
+    window.handleFileUpload = function(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      const badge = document.getElementById('file-badge');
+      document.getElementById('file-badge-name').textContent = file.name;
+      badge.classList.remove('hidden');
+      const reader = new FileReader();
+      reader.onload = ev => { document.getElementById('rawInput').value = ev.target.result; };
+      reader.readAsText(file);
+    };
+  </script>
+</body>
+</html>
