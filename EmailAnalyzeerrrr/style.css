@@ -36,6 +36,14 @@ body { background: var(--bg); color: var(--text); font-family: var(--font-main);
 /* ─── Scanline ─────────────────────────────────────────────────────── */
 .scanline { position: fixed; inset: 0; background: repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.03) 2px,rgba(0,0,0,0.03) 4px); pointer-events: none; z-index: 1000; }
 
+    /* NAV extra */
+    .nav{position:sticky;top:0;z-index:100;background:rgba(10,12,16,.93);backdrop-filter:blur(16px);border-bottom:1px solid var(--border)}
+    .nav-inner{max-width:1200px;margin:0 auto;padding:0 24px;height:60px;display:flex;align-items:center;justify-content:space-between}
+    .logo{display:flex;align-items:center;gap:9px;font-weight:900;font-size:18px;letter-spacing:-.03em;color:var(--text)}
+    .logo-icon{color:var(--accent)}
+    .nav-back{display:flex;align-items:center;gap:6px;font-size:13px;font-weight:600;color:var(--text2);padding:6px 12px;border-radius:7px;border:1px solid var(--border2);transition:all .2s;text-decoration:none}
+    .nav-back:hover{color:var(--text);background:var(--surface)}
+
 /* ─── Settings Modal ───────────────────────────────────────────────── */
 .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 500; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(4px); padding: 16px; }
 .modal { background: var(--surface); border: 1px solid var(--border2); border-radius: var(--radius-lg); width: 100%; max-width: 480px; }
