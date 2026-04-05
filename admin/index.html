@@ -5,9 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Admin — Cybthreat</title>
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Syne:wght@400;600;700;800;900&display=swap" rel="stylesheet"/>
-  <!-- Supabase -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
-  <!-- Quill rich text editor -->
   <link href="https://cdn.quilljs.com/1.3.7/quill.snow.css" rel="stylesheet"/>
   <script src="https://cdn.quilljs.com/1.3.7/quill.min.js"></script>
   <style>
@@ -136,6 +134,8 @@
     .action-btns{display:flex;gap:6px;align-items:center}
     .btn-del{background:none;border:1px solid rgba(255,77,77,.2);color:var(--red);padding:4px 10px;border-radius:6px;font-size:11px;cursor:pointer;transition:all .2s;font-family:var(--mono)}
     .btn-del:hover{background:var(--red-bg)}
+    .btn-edit{background:none;border:1px solid var(--border2);color:var(--blue);padding:4px 10px;border-radius:6px;font-size:11px;cursor:pointer;transition:all .2s;font-family:var(--mono)}
+    .btn-edit:hover{background:var(--blue-bg)}
     .btn-toggle{background:none;border:1px solid var(--border2);color:var(--text2);padding:4px 10px;border-radius:6px;font-size:11px;cursor:pointer;transition:all .2s;font-family:var(--mono)}
     .btn-toggle:hover{border-color:rgba(0,229,160,.3);color:var(--accent)}
 
@@ -161,7 +161,6 @@
 </head>
 <body>
 
-<!-- LOGIN -->
 <div id="loginScreen">
   <div class="login-card">
     <div class="login-logo">
@@ -183,7 +182,6 @@
   </div>
 </div>
 
-<!-- CONFIRM DIALOG -->
 <div class="confirm-overlay" id="confirmOverlay">
   <div class="confirm-box">
     <div class="confirm-title" id="confirmTitle">Are you sure?</div>
@@ -195,10 +193,8 @@
   </div>
 </div>
 
-<!-- APP SHELL -->
 <div class="shell" id="appShell" style="display:none">
 
-  <!-- SIDEBAR -->
   <aside class="sidebar">
     <div class="sb-logo">
       <svg width="20" height="20" viewBox="0 0 26 26" fill="none"><path d="M13 2L3 6v7c0 5.5 4.3 10.7 10 12 5.7-1.3 10-6.5 10-12V6L13 2z" stroke="currentColor" stroke-width="1.6" fill="rgba(0,229,160,0.08)"/><path d="M9 13l3 3 5-5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -256,9 +252,7 @@
     </div>
   </aside>
 
-  <!-- MAIN -->
   <div class="main">
-    <!-- TOPBAR -->
     <div class="topbar">
       <div class="topbar-title" id="topbarTitle">Dashboard</div>
       <div class="topbar-actions">
@@ -266,14 +260,13 @@
           <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M13.5 8A5.5 5.5 0 012.5 8M2.5 8c0-3.04 2.46-5.5 5.5-5.5 1.55 0 2.95.64 3.96 1.67" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><path d="M11 1v4h-4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
           Refresh
         </button>
-        <button class="btn btn-accent btn-sm" onclick="showView('addJob',null);document.querySelector('[onclick*=addJob]').classList.add('active')">+ New Job</button>
-        <button class="btn btn-sm" style="background:var(--blue-bg);color:var(--blue);border:1px solid rgba(77,158,255,.2)" onclick="showView('addNews',null)">+ New Article</button>
+        <button class="btn btn-accent btn-sm" onclick="showView('addJob',null);document.querySelector('[onclick*=addJob]').classList.add('active');resetJobForm()">+ New Job</button>
+        <button class="btn btn-sm" style="background:var(--blue-bg);color:var(--blue);border:1px solid rgba(77,158,255,.2)" onclick="showView('addNews',null);resetNewsForm()">+ New Article</button>
       </div>
     </div>
 
     <div class="content">
 
-      <!-- ── DASHBOARD ── -->
       <div class="view active" id="view-dashboard">
         <div class="stats-row">
           <div class="stat-card"><div class="stat-num stat-accent" id="ds-jobs">—</div><div class="stat-lbl">Active Jobs</div></div>
@@ -281,7 +274,6 @@
           <div class="stat-card"><div class="stat-num stat-blue" id="ds-news">—</div><div class="stat-lbl">Articles Published</div></div>
           <div class="stat-card"><div class="stat-num stat-amber" id="ds-newsweek">—</div><div class="stat-lbl">Articles This Week</div></div>
         </div>
-        <!-- Recent jobs table -->
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
           <div>
             <div style="font-size:13px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.07em;margin-bottom:12px">Recent Jobs</div>
@@ -294,13 +286,13 @@
         </div>
       </div>
 
-      <!-- ── ADD JOB ── -->
       <div class="view" id="view-addJob">
         <div class="form-card">
           <div class="form-title">
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="2" y="5" width="12" height="9" rx="1.5" stroke="currentColor" stroke-width="1.3"/><path d="M5 5V4a3 3 0 016 0v1" stroke="currentColor" stroke-width="1.3"/></svg>
-            Post a New Job
+            <span id="jobFormModeTitle">Post a New Job</span>
           </div>
+          <input type="hidden" id="editJobId"/>
           <div class="form-grid">
             <div class="field form-full">
               <label>Job Title <span class="req">*</span></label>
@@ -329,7 +321,7 @@
           <div class="form-actions">
             <button class="btn btn-accent" onclick="submitJob()" id="jSubmitBtn">
               <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="1.3"/><path d="M8 5v6M5 8h6" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
-              Post Job
+              <span id="jobBtnText">Post Job</span>
             </button>
             <button class="btn btn-ghost" onclick="resetJobForm()">Clear</button>
             <div class="toast" id="jToast"></div>
@@ -337,7 +329,6 @@
         </div>
       </div>
 
-      <!-- ── MANAGE JOBS ── -->
       <div class="view" id="view-manageJobs">
         <div class="table-wrap">
           <table>
@@ -350,13 +341,14 @@
         </div>
       </div>
 
-      <!-- ── ADD NEWS ── -->
       <div class="view" id="view-addNews">
         <div class="form-card">
           <div class="form-title">
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="1" y="2" width="14" height="12" rx="2" stroke="currentColor" stroke-width="1.3"/><path d="M4 6h8M4 9h5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
-            Write New Article
+            <span id="newsFormModeTitle">Write New Article</span>
           </div>
+          <input type="hidden" id="editNewsId"/>
+          <input type="hidden" id="existingImgUrl"/>
           <div class="form-grid">
             <div class="field form-full">
               <label>Article Title <span class="req">*</span></label>
@@ -393,7 +385,7 @@
           <div class="form-actions">
             <button class="btn btn-accent" onclick="submitNews()" id="nSubmitBtn">
               <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M14 2L9 14l-2-5-5-2 12-5z" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
-              Publish Article
+              <span id="newsBtnText">Publish Article</span>
             </button>
             <button class="btn btn-ghost" onclick="resetNewsForm()">Clear</button>
             <div class="toast" id="nToast"></div>
@@ -401,7 +393,6 @@
         </div>
       </div>
 
-      <!-- ── MANAGE NEWS ── -->
       <div class="view" id="view-manageNews">
         <div class="table-wrap">
           <table>
@@ -414,11 +405,7 @@
         </div>
       </div>
 
-    </div><!-- /content -->
-  </div><!-- /main -->
-</div><!-- /shell -->
-
-<script>
+    </div></div></div><script>
 // ── SUPABASE ──────────────────────────────────────────────────────────
 const SB = supabase.createClient('https://ylidxkzjoneekstobaka.supabase.co', 'sb_publishable_4NuDJYNw0PBplKmaOyIFlw_eF4j2cc6');
 
@@ -512,6 +499,7 @@ function previewImage(file) {
     preview.src = ev.target.result;
     preview.style.display = 'block';
     document.getElementById('imgRemoveBtn').style.display = 'inline-block';
+    document.querySelector('.img-upload-text').style.display = 'none';
   };
   reader.readAsDataURL(file);
 }
@@ -521,6 +509,8 @@ function removeImage() {
   document.getElementById('imgPreview').src = '';
   document.getElementById('imgRemoveBtn').style.display = 'none';
   document.getElementById('nImgInput').value = '';
+  document.getElementById('existingImgUrl').value = '';
+  document.querySelector('.img-upload-text').style.display = 'block';
 }
 async function uploadImage(file) {
   const ext = file.name.split('.').pop();
@@ -538,6 +528,7 @@ function toggleApplyType(type) {
 }
 
 async function submitJob() {
+  const id = document.getElementById('editJobId').value;
   const title = document.getElementById('jTitle').value.trim();
   const desc  = document.getElementById('jDesc').value.trim();
   const type  = document.querySelector('input[name=applyType]:checked').value;
@@ -549,59 +540,133 @@ async function submitJob() {
   if (type === 'email' && !email) { showToast('jToast','Please provide an application email.','err'); return; }
 
   const btn = document.getElementById('jSubmitBtn');
-  btn.disabled = true; btn.textContent = 'Posting…';
+  btn.disabled = true; btn.textContent = id ? 'Updating…' : 'Posting…';
 
   const payload = { title, description: desc, apply_link: type==='link' ? link : null, apply_email: type==='email' ? email : null };
-  const { error } = await SB.from('jobs').insert([payload]);
+  
+  let result;
+  if (id) {
+    result = await SB.from('jobs').update(payload).eq('id', id);
+  } else {
+    result = await SB.from('jobs').insert([payload]);
+  }
+
   btn.disabled = false;
-  btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="1.3"/><path d="M8 5v6M5 8h6" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg> Post Job';
-  if (error) { showToast('jToast','Error: '+error.message,'err'); return; }
-  showToast('jToast','✓ Job posted successfully!','ok');
+  btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="1.3"/><path d="M8 5v6M5 8h6" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg> ' + (id ? 'Update Job' : 'Post Job');
+  
+  if (result.error) { showToast('jToast','Error: '+result.error.message,'err'); return; }
+  showToast('jToast', id ? '✓ Job updated successfully!' : '✓ Job posted successfully!','ok');
   resetJobForm();
   refreshAll();
+  if (id) showView('manageJobs', document.querySelector('[onclick*=manageJobs]'));
 }
 
 function resetJobForm() {
+  document.getElementById('editJobId').value = '';
+  document.getElementById('jobFormModeTitle').textContent = 'Post a New Job';
+  document.getElementById('jobBtnText').textContent = 'Post Job';
   ['jTitle','jDesc','jLink','jEmail'].forEach(id => document.getElementById(id).value = '');
   document.querySelector('input[name=applyType][value=link]').checked = true;
   toggleApplyType('link');
 }
 
+async function editJob(id) {
+  const { data, error } = await SB.from('jobs').select('*').eq('id', id).single();
+  if (error || !data) return;
+  
+  showView('addJob', null);
+  document.getElementById('editJobId').value = data.id;
+  document.getElementById('jobFormModeTitle').textContent = 'Edit Job Listing';
+  document.getElementById('jobBtnText').textContent = 'Update Job';
+  
+  document.getElementById('jTitle').value = data.title;
+  document.getElementById('jDesc').value = data.description;
+  
+  if (data.apply_link) {
+    document.querySelector('input[name=applyType][value=link]').checked = true;
+    document.getElementById('jLink').value = data.apply_link;
+    toggleApplyType('link');
+  } else {
+    document.querySelector('input[name=applyType][value=email]').checked = true;
+    document.getElementById('jEmail').value = data.apply_email;
+    toggleApplyType('email');
+  }
+}
+
 // ── NEWS FORM ─────────────────────────────────────────────────────────
 async function submitNews() {
+  const id = document.getElementById('editNewsId').value;
   const title   = document.getElementById('nTitle').value.trim();
   const author  = document.getElementById('nAuthor').value.trim();
   const pub     = document.getElementById('nPublished').value === 'true';
   const body    = quill ? quill.root.innerHTML : '';
+  const existingImg = document.getElementById('existingImgUrl').value;
 
   if (!title || !author || !body || body === '<p><br></p>') {
     showToast('nToast','Please fill in all required fields.','err'); return;
   }
 
   const btn = document.getElementById('nSubmitBtn');
-  btn.disabled = true; btn.textContent = 'Publishing…';
+  btn.disabled = true; btn.textContent = id ? 'Updating…' : 'Publishing…';
 
-  let imageUrl = null;
+  let imageUrl = existingImg;
   if (selectedImageFile) {
     try { imageUrl = await uploadImage(selectedImageFile); }
     catch(e) { showToast('nToast','Image upload failed: '+e.message,'err'); btn.disabled=false; btn.textContent='Publish Article'; return; }
   }
 
   const payload = { title, author, body, image_url: imageUrl, is_published: pub };
-  const { error } = await SB.from('news').insert([payload]);
+  
+  let result;
+  if (id) {
+    result = await SB.from('news').update(payload).eq('id', id);
+  } else {
+    result = await SB.from('news').insert([payload]);
+  }
+
   btn.disabled = false;
-  btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M14 2L9 14l-2-5-5-2 12-5z" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg> Publish Article';
-  if (error) { showToast('nToast','Error: '+error.message,'err'); return; }
-  showToast('nToast','✓ Article published!','ok');
+  btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M14 2L9 14l-2-5-5-2 12-5z" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg> ' + (id ? 'Update Article' : 'Publish Article');
+  
+  if (result.error) { showToast('nToast','Error: '+result.error.message,'err'); return; }
+  showToast('nToast', id ? '✓ Article updated!' : '✓ Article published!','ok');
   resetNewsForm();
   refreshAll();
+  if (id) showView('manageNews', document.querySelector('[onclick*=manageNews]'));
 }
 
 function resetNewsForm() {
+  document.getElementById('editNewsId').value = '';
+  document.getElementById('existingImgUrl').value = '';
+  document.getElementById('newsFormModeTitle').textContent = 'Write New Article';
+  document.getElementById('newsBtnText').textContent = 'Publish Article';
   document.getElementById('nTitle').value = '';
   document.getElementById('nAuthor').value = '';
   if (quill) quill.setContents([]);
   removeImage();
+}
+
+async function editNews(id) {
+  const { data, error } = await SB.from('news').select('*').eq('id', id).single();
+  if (error || !data) return;
+
+  showView('addNews', null);
+  document.getElementById('editNewsId').value = data.id;
+  document.getElementById('newsFormModeTitle').textContent = 'Edit Article';
+  document.getElementById('newsBtnText').textContent = 'Update Article';
+  
+  document.getElementById('nTitle').value = data.title;
+  document.getElementById('nAuthor').value = data.author;
+  document.getElementById('nPublished').value = data.is_published.toString();
+  if (quill) quill.root.innerHTML = data.body;
+  
+  if (data.image_url) {
+    document.getElementById('existingImgUrl').value = data.image_url;
+    const preview = document.getElementById('imgPreview');
+    preview.src = data.image_url;
+    preview.style.display = 'block';
+    document.getElementById('imgRemoveBtn').style.display = 'inline-block';
+    document.querySelector('.img-upload-text').style.display = 'none';
+  }
 }
 
 // ── JOBS TABLE ────────────────────────────────────────────────────────
@@ -624,6 +689,7 @@ async function loadJobsTable() {
       <td class="td-mono">${expires}</td>
       <td>${status}</td>
       <td><div class="action-btns">
+        <button class="btn-edit" onclick="editJob('${j.id}')">Edit</button>
         <button class="btn-del" onclick="confirmDelete('jobs','${j.id}',loadJobsTable)">Delete</button>
       </div></td>
     </tr>`;
@@ -647,6 +713,7 @@ async function loadNewsTable() {
       <td>${status}</td>
       <td><div class="action-btns">
         <button class="btn-toggle" onclick="togglePublish('${n.id}',${n.is_published})">${n.is_published ? 'Unpublish' : 'Publish'}</button>
+        <button class="btn-edit" onclick="editNews('${n.id}')">Edit</button>
         <button class="btn-del" onclick="confirmDelete('news','${n.id}',loadNewsTable)">Delete</button>
       </div></td>
     </tr>`;
@@ -703,7 +770,7 @@ function confirmDelete(table, id, cb) {
       }
     }
     await SB.from(table).delete().eq('id', id);
-    closeConfirm(); cb();
+    closeConfirm(); cb(); refreshAll();
   };
   document.getElementById('confirmTitle').textContent = 'Delete this item?';
   document.getElementById('confirmSub').textContent = 'This cannot be undone. The item will be permanently removed.';
