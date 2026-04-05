@@ -30,15 +30,28 @@
       <nav class="nav">
         <a href="#sanitizer" class="nav-link active">Sanitizer</a>
         <a href="#about" class="nav-link">About</a>
-       <a href="../index.html" class="nav-link nav-back">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <polyline points="15 18 9 12 15 6"></polyline>
-        </svg>
-         Back to Home
+        <a href="../index.html" class="nav-link nav-home">
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M2 6.5L8 2l6 4.5V14a1 1 0 01-1 1H3a1 1 0 01-1-1V6.5z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/><path d="M6 15V9h4v6" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg>
+          Home
         </a>
       </nav>
+      <!-- Hamburger -->
+      <button class="hamburger" id="hamburger" aria-label="Menu">
+        <span></span><span></span><span></span>
+      </button>
     </div>
   </header>
+
+  <!-- Mobile nav -->
+  <div class="mobile-nav" id="mobileNav">
+    <a href="#sanitizer" class="nav-link" onclick="closeMobileNav()">Sanitizer</a>
+    <a href="#about" class="nav-link" onclick="closeMobileNav()">About</a>
+    <div class="mobile-nav-divider"></div>
+    <a href="../index.html" class="nav-link nav-home">
+      <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M2 6.5L8 2l6 4.5V14a1 1 0 01-1 1H3a1 1 0 01-1-1V6.5z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/><path d="M6 15V9h4v6" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg>
+      Back to Home
+    </a>
+  </div>
 
   <!-- HERO -->
   <section class="hero">
@@ -325,7 +338,7 @@ Each token is unique and reversible via the Mapping tab below."></textarea>
 
   <script src="sanitizer.js"></script>
   <script>
-    // Wire up stats bar visibility and file badge name
+    // Wire up stats bar visibility
     const _orig = window.sanitizeLog;
     window.sanitizeLog = function() {
       _orig();
@@ -344,6 +357,25 @@ Each token is unique and reversible via the Mapping tab below."></textarea>
       reader.onload = ev => { document.getElementById('rawInput').value = ev.target.result; };
       reader.readAsText(file);
     };
+
+    // Hamburger menu
+    const hb = document.getElementById('hamburger');
+    const mn = document.getElementById('mobileNav');
+    hb.addEventListener('click', () => {
+      hb.classList.toggle('open');
+      mn.classList.toggle('open');
+      document.body.style.overflow = mn.classList.contains('open') ? 'hidden' : '';
+    });
+    function closeMobileNav() {
+      hb.classList.remove('open');
+      mn.classList.remove('open');
+      document.body.style.overflow = '';
+    }
+    document.addEventListener('click', e => {
+      if (mn.classList.contains('open') && !mn.contains(e.target) && !hb.contains(e.target)) {
+        closeMobileNav();
+      }
+    });
   </script>
 </body>
 </html>
