@@ -6,6 +6,7 @@
   <title>Threat Intelligence — Cybthreat</title>
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Syne:wght@400;600;700;800;900&display=swap" rel="stylesheet"/>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="../config.js"></script>
   <style>
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
     :root{
@@ -13,129 +14,178 @@
       --surface:#161b24;--surface2:#1c2230;
       --border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.12);
       --text:#e8eaf0;--text2:#8b93a8;--text3:#555d72;
-      --accent:#00e5a0;--accent-dim:rgba(0,229,160,0.1);
+      --accent:#00e5a0;--accent2:#00ffb3;--accent-dim:rgba(0,229,160,0.1);
       --red:#ff4d4d;--red-bg:rgba(255,77,77,0.1);
-      --amber:#ffb547;--amber-bg:rgba(255,181,71,0.1);
-      --blue:#4d9eff;--blue-bg:rgba(77,158,255,0.1);
+      --amber:#ffb547;
+      --blue:#4d9eff;
       --font:'Syne',sans-serif;--mono:'JetBrains Mono',monospace;
       --r:10px;--rl:14px;
     }
     html{scroll-behavior:smooth}
-    body{background:var(--bg);color:var(--text);font-family:var(--font);line-height:1.6;min-height:100vh}
+    body{background:var(--bg);color:var(--text);font-family:var(--font);line-height:1.6;min-height:100vh;overflow-x:hidden}
     .scanline{position:fixed;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.022) 2px,rgba(0,0,0,0.022) 4px);pointer-events:none;z-index:999}
 
     /* NAV */
-    .nav{position:sticky;top:0;z-index:100;background:rgba(10,12,16,.93);backdrop-filter:blur(16px);border-bottom:1px solid var(--border)}
-    .nav-inner{max-width:1200px;margin:0 auto;padding:0 24px;height:60px;display:flex;align-items:center;justify-content:space-between}
-    .logo{display:flex;align-items:center;gap:9px;font-weight:900;font-size:18px;letter-spacing:-.03em;color:var(--text)}
-    .logo-icon{color:var(--accent)}
-    .nav-back{display:flex;align-items:center;gap:6px;font-size:13px;font-weight:600;color:var(--text2);padding:6px 12px;border-radius:7px;border:1px solid var(--border2);transition:all .2s;text-decoration:none}
-    .nav-back:hover{color:var(--text);background:var(--surface)}
+    .nav{position:sticky;top:0;z-index:200;background:rgba(10,12,16,.95);backdrop-filter:blur(16px);border-bottom:1px solid var(--border)}
+    .nav-inner{max-width:1200px;margin:0 auto;padding:0 24px;height:60px;display:flex;align-items:center;justify-content:space-between;gap:16px}
+    .logo{display:flex;align-items:center;gap:9px;font-weight:900;font-size:18px;letter-spacing:-.03em;color:var(--text);text-decoration:none}
+    .logo-icon{color:var(--accent);display:flex}
+    .nav-back{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:600;color:var(--text2);padding:6px 14px;border-radius:7px;border:1px solid var(--border2);transition:all .2s;text-decoration:none;white-space:nowrap}
+    .nav-back:hover{color:var(--accent);border-color:rgba(0,229,160,.3);background:var(--accent-dim)}
 
     /* HERO */
-    .hero{padding:64px 24px 48px;position:relative;overflow:hidden;background:linear-gradient(180deg,var(--bg) 0%,var(--bg2) 100%)}
+    .hero{padding:52px 24px 40px;position:relative;overflow:hidden;background:linear-gradient(180deg,var(--bg) 0%,var(--bg2) 100%)}
     .hero::before{content:'';position:absolute;inset:0;background-image:linear-gradient(var(--border) 1px,transparent 1px),linear-gradient(90deg,var(--border) 1px,transparent 1px);background-size:44px 44px;mask-image:radial-gradient(ellipse 80% 80% at 50% 50%,black 0%,transparent 80%)}
-    .hero-inner{position:relative;z-index:1;max-width:1200px;margin:0 auto;display:grid;grid-template-columns:1fr auto;align-items:end;gap:32px}
-    .hero-tag{display:inline-flex;align-items:center;gap:7px;font-family:var(--mono);font-size:10px;color:var(--red);background:var(--red-bg);border:1px solid rgba(255,77,77,.2);padding:4px 12px;border-radius:20px;margin-bottom:16px;letter-spacing:.05em}
-    .blink{width:5px;height:5px;background:var(--red);border-radius:50%;animation:blink 1s infinite}
+    .hero-inner{position:relative;z-index:1;max-width:1200px;margin:0 auto;display:flex;align-items:flex-end;justify-content:space-between;gap:24px;flex-wrap:wrap}
+    .hero-tag{display:inline-flex;align-items:center;gap:7px;font-family:var(--mono);font-size:10px;color:var(--red);background:var(--red-bg);border:1px solid rgba(255,77,77,.2);padding:4px 12px;border-radius:20px;margin-bottom:14px;letter-spacing:.05em}
+    .blink{width:5px;height:5px;background:var(--red);border-radius:50%;animation:blink 1s infinite;flex-shrink:0}
     @keyframes blink{0%,100%{opacity:1}50%{opacity:.15}}
-    .hero-h1{font-size:clamp(30px,4.5vw,50px);font-weight:900;letter-spacing:-.04em;margin-bottom:12px}
+    .hero-h1{font-size:clamp(28px,4.5vw,48px);font-weight:900;letter-spacing:-.04em;margin-bottom:10px}
     .hero-h1 span{color:var(--accent)}
     .hero-sub{font-size:14px;color:var(--text2);max-width:500px;line-height:1.7}
-    .live-clock{font-family:var(--mono);font-size:11px;color:var(--text3);text-align:right}
-    .live-clock .utc{font-size:22px;font-weight:700;color:var(--text);display:block;margin-bottom:2px}
-    .live-clock .label{color:var(--accent);letter-spacing:.08em}
+    .live-clock{font-family:var(--mono);font-size:11px;color:var(--text3);text-align:right;flex-shrink:0}
+    .live-clock .utc{font-size:24px;font-weight:700;color:var(--text);display:block;margin-bottom:2px;letter-spacing:-.02em}
+    .live-clock .label{color:var(--accent);letter-spacing:.1em;font-size:10px}
 
-    /* TICKER BAR */
-    .ticker-bar{background:rgba(255,30,30,.08);border-top:1px solid rgba(255,77,77,.15);border-bottom:1px solid rgba(255,77,77,.15);padding:8px 0;overflow:hidden;white-space:nowrap}
-    .ticker-inner{display:inline-flex;align-items:center;gap:0;animation:tickerAnim 35s linear infinite}
-    .ticker-item{display:inline-flex;align-items:center;gap:8px;font-family:var(--mono);font-size:11px;color:var(--text2);padding:0 24px}
-    .ticker-sep{color:var(--red);opacity:.4}
+    /* TICKER */
+    .ticker-bar{background:rgba(255,30,30,.08);border-top:1px solid rgba(255,77,77,.15);border-bottom:1px solid rgba(255,77,77,.15);padding:7px 0;overflow:hidden;white-space:nowrap;user-select:none}
+    .ticker-inner{display:inline-block;animation:tickerAnim 38s linear infinite;white-space:nowrap}
+    .ticker-inner:hover{animation-play-state:paused}
+    .ticker-item{display:inline;font-family:var(--mono);font-size:11px;color:var(--text2);padding:0 24px}
+    .ticker-sep{color:var(--red);opacity:.5;margin-right:6px}
     @keyframes tickerAnim{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
 
-    /* LAYOUT */
-    .page-wrap{max-width:1200px;margin:0 auto;padding:32px 24px 80px;display:grid;grid-template-columns:1fr 300px;gap:28px;align-items:start}
+    /* PAGE LAYOUT */
+    .page-wrap{max-width:1200px;margin:0 auto;padding:32px 24px 80px;display:grid;grid-template-columns:1fr 300px;gap:32px;align-items:start}
 
-    /* MAIN FEED */
+    /* FEED */
     .feed-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:10px}
-    .feed-title{font-size:13px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.08em}
+    .feed-title{font-size:12px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.1em}
     .search-wrap{position:relative}
     .search-wrap svg{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--text3);pointer-events:none}
-    .search-input{background:var(--surface);border:1px solid var(--border2);border-radius:var(--r);padding:8px 12px 8px 32px;font-family:var(--mono);font-size:12px;color:var(--text);outline:none;width:200px;transition:border-color .2s}
+    .search-input{background:var(--surface);border:1px solid var(--border2);border-radius:var(--r);padding:8px 12px 8px 32px;font-family:var(--mono);font-size:12px;color:var(--text);outline:none;width:220px;transition:border-color .2s}
     .search-input::placeholder{color:var(--text3)}
     .search-input:focus{border-color:rgba(0,229,160,.4)}
-
-    .news-feed{display:flex;flex-direction:column;gap:20px}
+    .news-feed{display:flex;flex-direction:column;gap:0}
 
     /* NEWS CARD */
-    .news-card{background:var(--surface);border:1px solid var(--border2);border-radius:var(--rl);overflow:hidden;transition:all .25s;cursor:pointer}
-    .news-card:hover{border-color:rgba(0,229,160,.3);transform:translateY(-2px);box-shadow:0 12px 40px rgba(0,0,0,.3)}
-    .news-card-img{width:100%;height:200px;object-fit:cover;display:block;background:var(--bg3)}
-    .news-card-img-placeholder{width:100%;height:180px;background:linear-gradient(135deg,var(--bg3),var(--surface2));display:flex;align-items:center;justify-content:center;color:var(--text3)}
-    .news-card-body{padding:20px 22px 22px}
+    .news-card{background:var(--surface);border:1px solid var(--border2);border-radius:var(--rl);overflow:hidden;transition:border-color .25s,transform .25s,box-shadow .25s;cursor:pointer;margin-bottom:22px}
+    .news-card:hover{border-color:rgba(0,229,160,.35);transform:translateY(-3px);box-shadow:0 16px 48px rgba(0,0,0,.35)}
+    .news-card:last-child{margin-bottom:0}
+
+    /* BIG image */
+    .card-img-wrap{overflow:hidden;width:100%}
+    .news-card-img{width:100%;height:280px;object-fit:cover;display:block;transition:transform .45s ease}
+    .news-card:hover .news-card-img{transform:scale(1.03)}
+    .news-card-img-placeholder{width:100%;height:220px;background:linear-gradient(135deg,var(--bg3) 0%,var(--surface2) 100%);display:flex;align-items:center;justify-content:center;color:var(--text3)}
+    .news-card.featured .news-card-img{height:360px}
+    .news-card.featured .news-card-img-placeholder{height:280px}
+
+    .news-card-body{padding:22px 24px 24px}
     .news-card-meta{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:10px}
     .news-date{font-family:var(--mono);font-size:10px;color:var(--text3)}
-    .news-author{font-family:var(--mono);font-size:10px;color:var(--accent);background:var(--accent-dim);padding:2px 8px;border-radius:4px}
-    .news-new-badge{font-family:var(--mono);font-size:9px;font-weight:700;color:var(--red);background:var(--red-bg);border:1px solid rgba(255,77,77,.2);padding:2px 7px;border-radius:10px;letter-spacing:.07em;animation:pulse .5s ease}
-    @keyframes pulse{0%{transform:scale(0.9)}100%{transform:scale(1)}}
-    .news-title{font-size:17px;font-weight:800;letter-spacing:-.02em;line-height:1.3;margin-bottom:10px;color:var(--text)}
-    .news-excerpt{font-size:13px;color:var(--text2);line-height:1.65;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;margin-bottom:14px}
-    .news-read-more{display:inline-flex;align-items:center;gap:5px;font-family:var(--mono);font-size:11px;color:var(--accent);transition:gap .2s}
-    .news-read-more:hover{gap:9px}
+    .news-author{font-family:var(--mono);font-size:10px;color:var(--accent);background:var(--accent-dim);padding:2px 8px;border-radius:4px;border:1px solid rgba(0,229,160,.15)}
+    .news-new-badge{font-family:var(--mono);font-size:9px;font-weight:700;color:var(--red);background:var(--red-bg);border:1px solid rgba(255,77,77,.25);padding:2px 8px;border-radius:10px;letter-spacing:.07em;animation:popIn .3s ease}
+    @keyframes popIn{from{transform:scale(.8);opacity:0}to{transform:scale(1);opacity:1}}
+    .news-title{font-size:19px;font-weight:800;letter-spacing:-.03em;line-height:1.3;margin-bottom:10px;color:var(--text)}
+    .news-card.featured .news-title{font-size:22px}
+    .news-excerpt{font-size:13px;color:var(--text2);line-height:1.7;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;margin-bottom:16px}
+    .news-card.featured .news-excerpt{-webkit-line-clamp:4}
+    .news-footer{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
+    .news-read-more{display:inline-flex;align-items:center;gap:6px;font-family:var(--mono);font-size:11px;color:var(--accent);background:var(--accent-dim);padding:6px 14px;border-radius:20px;border:1px solid rgba(0,229,160,.2);transition:all .2s}
+    .news-read-more:hover{background:rgba(0,229,160,.18)}
+    .news-read-time{font-family:var(--mono);font-size:10px;color:var(--text3)}
 
     /* MODAL */
-    .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:500;display:flex;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(4px);animation:fadeIn .2s ease}
+    .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.82);z-index:500;display:flex;align-items:center;justify-content:center;padding:16px;backdrop-filter:blur(6px);animation:fadeIn .2s ease}
     @keyframes fadeIn{from{opacity:0}to{opacity:1}}
-    .modal-overlay.hidden{display:none}
-    .modal{background:var(--surface);border:1px solid var(--border2);border-radius:var(--rl);max-width:740px;width:100%;max-height:90vh;overflow-y:auto;animation:slideUp .25s ease}
-    @keyframes slideUp{from{transform:translateY(20px);opacity:0}to{transform:translateY(0);opacity:1}}
-    .modal-img{width:100%;max-height:320px;object-fit:cover;display:block}
-    .modal-body{padding:28px 32px 32px}
-    .modal-meta{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:14px}
-    .modal-title{font-size:clamp(20px,3vw,28px);font-weight:900;letter-spacing:-.03em;margin-bottom:20px;line-height:1.2}
-    .modal-content{font-size:14px;color:var(--text2);line-height:1.8}
-    .modal-content h1,.modal-content h2,.modal-content h3{color:var(--text);margin:20px 0 8px;font-weight:700}
-    .modal-content p{margin-bottom:12px}
+    .modal-overlay.hidden{display:none!important}
+    .modal{background:var(--surface);border:1px solid var(--border2);border-radius:16px;max-width:760px;width:100%;max-height:88vh;overflow-y:auto;overflow-x:hidden;animation:slideUp .25s ease;position:relative}
+    @keyframes slideUp{from{transform:translateY(24px);opacity:0}to{transform:translateY(0);opacity:1}}
+
+    /* sticky close bar */
+    .modal-close-bar{position:sticky;top:0;z-index:20;background:rgba(22,27,36,.96);backdrop-filter:blur(10px);border-bottom:1px solid var(--border);padding:10px 18px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+    .modal-close-label{font-family:var(--mono);font-size:10px;color:var(--text3);letter-spacing:.08em}
+    .modal-close-btn{background:var(--surface2);border:1px solid var(--border2);color:var(--text2);width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:14px;line-height:1;transition:all .2s;flex-shrink:0}
+    .modal-close-btn:hover{color:var(--text);background:var(--red-bg);border-color:rgba(255,77,77,.3)}
+
+    .modal-img-wrap{overflow:hidden;width:100%}
+    .modal-img{width:100%;max-height:420px;object-fit:cover;display:block}
+    .modal-body{padding:28px 32px 36px}
+    .modal-meta{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:16px}
+    .modal-title{font-size:clamp(20px,3vw,30px);font-weight:900;letter-spacing:-.03em;margin-bottom:20px;line-height:1.2;color:var(--text)}
+    .modal-divider{height:1px;background:var(--border);margin-bottom:24px}
+    .modal-content{font-size:15px;color:var(--text2);line-height:1.85}
+    .modal-content h1{font-size:22px;font-weight:800;color:var(--text);margin:28px 0 12px;letter-spacing:-.02em}
+    .modal-content h2{font-size:19px;font-weight:700;color:var(--text);margin:24px 0 10px}
+    .modal-content h3{font-size:16px;font-weight:700;color:var(--text);margin:20px 0 8px}
+    .modal-content p{margin-bottom:16px}
     .modal-content strong,.modal-content b{color:var(--text);font-weight:700}
-    .modal-content em,.modal-content i{font-style:italic;color:var(--text)}
+    .modal-content em,.modal-content i{font-style:italic}
     .modal-content u{text-decoration:underline}
-    .modal-content ul,.modal-content ol{padding-left:20px;margin-bottom:12px}
-    .modal-content li{margin-bottom:4px}
-    .modal-content a{color:var(--accent);text-decoration:underline}
-    .modal-content blockquote{border-left:3px solid var(--accent);padding-left:14px;margin:16px 0;color:var(--text3)}
-    .modal-content img{max-width:100%;border-radius:8px;margin:10px 0}
-    .modal-content code{font-family:var(--mono);background:var(--bg3);padding:1px 6px;border-radius:3px;font-size:12px}
-    .modal-close{position:sticky;top:12px;float:right;background:var(--surface2);border:1px solid var(--border2);color:var(--text2);width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;transition:all .2s;z-index:10;margin-left:auto;margin-bottom:-32px}
-    .modal-close:hover{color:var(--text);background:var(--surface)}
+    .modal-content ul,.modal-content ol{padding-left:22px;margin-bottom:16px}
+    .modal-content li{margin-bottom:6px}
+    .modal-content a{color:var(--accent);text-decoration:underline;word-break:break-word}
+    .modal-content a:hover{color:var(--accent2)}
+    .modal-content blockquote{border-left:3px solid var(--accent);padding:10px 16px;margin:20px 0;background:var(--accent-dim);border-radius:0 8px 8px 0;color:var(--text2)}
+    .modal-content img{max-width:100%;border-radius:10px;margin:16px 0;display:block}
+    .modal-content code{font-family:var(--mono);background:var(--bg3);padding:2px 7px;border-radius:4px;font-size:13px;color:var(--accent)}
+    .modal-content pre{background:var(--bg3);padding:16px;border-radius:var(--r);overflow-x:auto;margin:16px 0}
+    .modal-content pre code{background:none;padding:0;font-size:12px}
+    .modal-content hr{border:none;border-top:1px solid var(--border);margin:24px 0}
 
     /* SIDEBAR */
     .sidebar{display:flex;flex-direction:column;gap:16px;position:sticky;top:80px}
     .sidebar-card{background:var(--surface);border:1px solid var(--border2);border-radius:var(--rl);padding:18px}
-    .sidebar-title{font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid var(--border)}
-    .trend-item{display:flex;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);align-items:flex-start;cursor:pointer;transition:opacity .2s}
+    .sidebar-title{font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.1em;margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid var(--border)}
+    .trend-item{display:flex;gap:10px;padding:9px 0;border-bottom:1px solid var(--border);align-items:flex-start;cursor:pointer;transition:opacity .2s}
     .trend-item:last-child{border-bottom:none}
-    .trend-item:hover{opacity:.75}
+    .trend-item:hover{opacity:.72}
     .trend-num{font-family:var(--mono);font-size:10px;color:var(--text3);width:16px;flex-shrink:0;padding-top:2px}
     .trend-title{font-size:12px;font-weight:700;color:var(--text);line-height:1.4}
-    .trend-date{font-family:var(--mono);font-size:9px;color:var(--text3);margin-top:2px}
-    .stat-row{display:flex;align-items:center;justify-content:space-between;padding:6px 0}
+    .trend-date{font-family:var(--mono);font-size:9px;color:var(--text3);margin-top:3px}
+    .stat-row{display:flex;align-items:center;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--border)}
+    .stat-row:last-child{border-bottom:none}
     .stat-label{font-size:12px;color:var(--text2)}
-    .stat-val{font-family:var(--mono);font-size:13px;font-weight:700;color:var(--accent)}
+    .stat-val{font-family:var(--mono);font-size:14px;font-weight:700;color:var(--accent)}
 
     /* LOAD MORE */
-    .load-more-wrap{display:flex;justify-content:center;margin-top:24px}
-    .btn-load-more{background:var(--surface);border:1px solid var(--border2);color:var(--text2);font-family:var(--mono);font-size:12px;padding:10px 24px;border-radius:var(--r);cursor:pointer;transition:all .2s}
-    .btn-load-more:hover{border-color:rgba(0,229,160,.3);color:var(--accent)}
-    .btn-load-more:disabled{opacity:.4;cursor:default}
+    .load-more-wrap{display:flex;justify-content:center;margin-top:4px}
+    .btn-load-more{background:var(--surface);border:1px solid var(--border2);color:var(--text2);font-family:var(--mono);font-size:12px;padding:10px 28px;border-radius:var(--r);cursor:pointer;transition:all .2s}
+    .btn-load-more:hover{border-color:rgba(0,229,160,.3);color:var(--accent);background:var(--accent-dim)}
 
     /* EMPTY / LOADING */
-    .empty{display:flex;flex-direction:column;align-items:center;gap:10px;padding:60px 20px;color:var(--text3);text-align:center}
+    .empty{display:flex;flex-direction:column;align-items:center;gap:12px;padding:60px 20px;color:var(--text3);text-align:center}
+    .empty span{font-family:var(--mono);font-size:13px}
     .spinner{width:28px;height:28px;border:2px solid var(--border2);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite}
     @keyframes spin{to{transform:rotate(360deg)}}
 
-    @media(max-width:900px){.page-wrap{grid-template-columns:1fr}.sidebar{display:none}.hero-inner{grid-template-columns:1fr}}
-    @media(max-width:600px){.hero{padding:48px 16px 36px}.page-wrap{padding:24px 16px 60px}.modal-body{padding:20px 20px 24px}}
-    ::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:var(--bg2)}::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
+    /* RESPONSIVE */
+    @media(max-width:1000px){.page-wrap{grid-template-columns:1fr}.sidebar{display:none}}
+    @media(max-width:700px){
+      .page-wrap{padding:20px 16px 60px}
+      .hero{padding:40px 16px 32px}
+      .nav-inner{padding:0 16px}
+      .news-card-img{height:220px}
+      .news-card.featured .news-card-img{height:260px}
+      .news-card-body{padding:16px 18px 20px}
+      .news-title{font-size:17px}
+      .news-card.featured .news-title{font-size:19px}
+      .search-input{width:150px}
+      .modal-body{padding:20px 20px 28px}
+      .modal-img{max-height:260px}
+      .live-clock{display:none}
+    }
+    @media(max-width:480px){
+      .news-card-img{height:180px}
+      .news-card.featured .news-card-img{height:220px}
+      .search-input{width:120px;font-size:11px}
+      .modal-body{padding:16px 16px 24px}
+    }
+
+    ::-webkit-scrollbar{width:5px;height:5px}
+    ::-webkit-scrollbar-track{background:var(--bg2)}
+    ::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
   </style>
 </head>
 <body>
@@ -144,12 +194,17 @@
 <!-- NAV -->
 <nav class="nav">
   <div class="nav-inner">
-    <a href="../index.html" class="logo" style="text-decoration:none">
-      <span class="logo-icon"><svg width="22" height="22" viewBox="0 0 26 26" fill="none"><path d="M13 2L3 6v7c0 5.5 4.3 10.7 10 12 5.7-1.3 10-6.5 10-12V6L13 2z" stroke="currentColor" stroke-width="1.6" fill="rgba(0,229,160,0.08)"/><path d="M9 13l3 3 5-5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+    <a href="../index.html" class="logo">
+      <span class="logo-icon">
+        <svg width="22" height="22" viewBox="0 0 26 26" fill="none">
+          <path d="M13 2L3 6v7c0 5.5 4.3 10.7 10 12 5.7-1.3 10-6.5 10-12V6L13 2z" stroke="currentColor" stroke-width="1.6" fill="rgba(0,229,160,0.08)"/>
+          <path d="M9 13l3 3 5-5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </span>
       Cybthreat
     </a>
     <a href="../index.html" class="nav-back">
-      <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M10 3L5 8l5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M10 3L5 8l5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
       Back to Home
     </a>
   </div>
@@ -172,17 +227,25 @@
 
 <!-- TICKER -->
 <div class="ticker-bar">
-  <div class="ticker-inner" id="tickerInner"></div>
+  <div class="ticker-inner" id="tickerInner">
+    <span class="ticker-item"><span class="ticker-sep">●</span> Loading latest intelligence…</span>
+  </div>
 </div>
 
 <!-- MODAL -->
-<div class="modal-overlay hidden" id="newsModal" onclick="closeModal(event)">
-  <div class="modal" id="modalContent">
-    <button class="modal-close" onclick="document.getElementById('newsModal').classList.add('hidden')">✕</button>
-    <img id="modalImg" src="" alt="" class="modal-img" style="display:none"/>
+<div class="modal-overlay hidden" id="newsModal">
+  <div class="modal" id="modalBox">
+    <div class="modal-close-bar">
+      <span class="modal-close-label">CYBTHREAT INTEL</span>
+      <button class="modal-close-btn" id="modalCloseBtn" aria-label="Close article">✕</button>
+    </div>
+    <div class="modal-img-wrap">
+      <img id="modalImg" src="" alt="" class="modal-img" style="display:none"/>
+    </div>
     <div class="modal-body">
       <div class="modal-meta" id="modalMeta"></div>
       <div class="modal-title" id="modalTitle"></div>
+      <div class="modal-divider"></div>
       <div class="modal-content" id="modalBody"></div>
     </div>
   </div>
@@ -190,7 +253,6 @@
 
 <!-- PAGE -->
 <div class="page-wrap">
-  <!-- MAIN -->
   <main>
     <div class="feed-header">
       <div class="feed-title">Latest Intelligence</div>
@@ -202,13 +264,14 @@
     <div id="feedLoading" class="empty"><div class="spinner"></div></div>
     <div class="news-feed" id="newsFeed" style="display:none"></div>
     <div id="feedEmpty" class="empty" style="display:none">
-      <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
+      <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" opacity=".4"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
       <span>No articles found</span>
     </div>
-    <div class="load-more-wrap"><button class="btn-load-more" id="loadMoreBtn" onclick="loadMore()" style="display:none">Load More</button></div>
+    <div class="load-more-wrap">
+      <button class="btn-load-more" id="loadMoreBtn" onclick="loadMore()" style="display:none">Load More Articles</button>
+    </div>
   </main>
 
-  <!-- SIDEBAR -->
   <aside class="sidebar">
     <div class="sidebar-card">
       <div class="sidebar-title">Feed Statistics</div>
@@ -224,26 +287,21 @@
 </div>
 
 <script>
-const SB = supabase.createClient('https://ylidxkzjoneekstobaka.supabase.co','sb_publishable_4NuDJYNw0PBplKmaOyIFlw_eF4j2cc6');
+const SB = supabase.createClient(CYBTHREAT_CONFIG.supabaseUrl, CYBTHREAT_CONFIG.supabaseKey);
 let allNews = [];
 const PAGE_SIZE = 8;
 let shown = PAGE_SIZE;
+let savedScrollY = 0; // for scroll-lock fix
 
-// ── Clock ──
+// Clock
 function updateClock() {
-  const n = new Date();
-  document.getElementById('clockUtc').textContent = n.toUTCString().slice(17,25);
+  document.getElementById('clockUtc').textContent = new Date().toUTCString().slice(17,25);
 }
 updateClock(); setInterval(updateClock, 1000);
 
-// ── Load news ──
+// Load
 async function loadNews() {
-  const { data, error } = await SB
-    .from('news')
-    .select('*')
-    .eq('is_published', true)
-    .order('posted_at', { ascending: false });
-
+  const { data, error } = await SB.from('news').select('*').eq('is_published',true).order('posted_at',{ascending:false});
   if (error) { console.error(error); return; }
   allNews = data || [];
   document.getElementById('feedLoading').style.display = 'none';
@@ -253,9 +311,8 @@ async function loadNews() {
   buildTicker();
 }
 
-function isNew(article) {
-  return (Date.now() - new Date(article.posted_at)) < 24*60*60*1000;
-}
+function isNew(a) { return (Date.now() - new Date(a.posted_at)) < 24*60*60*1000; }
+function readTime(html) { return Math.max(1,Math.ceil(stripHtml(html).split(/\s+/).length/200))+' min read'; }
 
 function getFiltered() {
   const q = document.getElementById('newsSearch').value.toLowerCase();
@@ -266,100 +323,125 @@ function renderNews() {
   const filtered = getFiltered();
   const feed = document.getElementById('newsFeed');
   const empty = document.getElementById('feedEmpty');
-  const loadBtn = document.getElementById('loadMoreBtn');
-
-  if (!filtered.length) { feed.style.display = 'none'; empty.style.display = 'flex'; loadBtn.style.display = 'none'; return; }
+  const btn = document.getElementById('loadMoreBtn');
+  if (!filtered.length) { feed.style.display='none'; empty.style.display='flex'; btn.style.display='none'; return; }
   empty.style.display = 'none'; feed.style.display = 'flex';
-
-  const visible = filtered.slice(0, shown);
-  feed.innerHTML = visible.map(n => newsCard(n)).join('');
-  loadBtn.style.display = filtered.length > shown ? 'block' : 'none';
+  feed.innerHTML = filtered.slice(0, shown).map((n,i) => newsCard(n, i===0)).join('');
+  btn.style.display = filtered.length > shown ? 'block' : 'none';
 }
 
 function loadMore() { shown += PAGE_SIZE; renderNews(); }
 
-function newsCard(article) {
-  const date = new Date(article.posted_at).toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'});
-  const imgHtml = article.image_url
-    ? `<img src="${article.image_url}" alt="${escHtml(article.title)}" class="news-card-img" loading="lazy"/>`
-    : `<div class="news-card-img-placeholder"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" opacity=".3"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg></div>`;
-
-  const excerpt = stripHtml(article.body).slice(0, 160) + '…';
-  const newBadge = isNew(article) ? '<span class="news-new-badge">● NEW</span>' : '';
-
+function newsCard(a, featured) {
+  const date = new Date(a.posted_at).toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'});
+  const badge = isNew(a) ? '<span class="news-new-badge">● NEW</span>' : '';
+  const rt = readTime(a.body);
+  const excerpt = stripHtml(a.body).slice(0, featured?220:160)+'…';
+  const imgHtml = a.image_url
+    ? `<div class="card-img-wrap"><img src="${a.image_url}" alt="${escHtml(a.title)}" class="news-card-img" loading="lazy"/></div>`
+    : `<div class="news-card-img-placeholder"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" opacity=".2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg></div>`;
   return `
-  <div class="news-card" onclick="openModal('${article.id}')">
+  <div class="news-card${featured?' featured':''}" onclick="openModal('${a.id}')">
     ${imgHtml}
     <div class="news-card-body">
       <div class="news-card-meta">
         <span class="news-date">${date}</span>
-        <span class="news-author">${escHtml(article.author)}</span>
-        ${newBadge}
+        <span class="news-author">${escHtml(a.author)}</span>
+        ${badge}
       </div>
-      <div class="news-title">${escHtml(article.title)}</div>
+      <div class="news-title">${escHtml(a.title)}</div>
       <div class="news-excerpt">${escHtml(excerpt)}</div>
-      <span class="news-read-more">Read full article <svg width="11" height="11" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></span>
+      <div class="news-footer">
+        <span class="news-read-more">Read full article <svg width="11" height="11" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></span>
+        <span class="news-read-time">${rt}</span>
+      </div>
     </div>
   </div>`;
 }
 
+// ── MODAL OPEN — with scroll-lock fix ────────────────────────────────
 function openModal(id) {
-  const article = allNews.find(n => n.id === id);
-  if (!article) return;
-  const date = new Date(article.posted_at).toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'});
+  const a = allNews.find(n => n.id === id);
+  if (!a) return;
+
+  // Save current scroll BEFORE locking
+  savedScrollY = window.scrollY;
+
+  // Populate modal
   const img = document.getElementById('modalImg');
-  if (article.image_url) { img.src = article.image_url; img.style.display = 'block'; }
+  if (a.image_url) { img.src = a.image_url; img.style.display = 'block'; }
   else img.style.display = 'none';
-  document.getElementById('modalMeta').innerHTML = `
-    <span class="news-date">${date}</span>
-    <span class="news-author">${escHtml(article.author)}</span>
-    ${isNew(article) ? '<span class="news-new-badge">● NEW</span>' : ''}`;
-  document.getElementById('modalTitle').textContent = article.title;
-  document.getElementById('modalBody').innerHTML = article.body; // HTML from rich editor
+
+  const date = new Date(a.posted_at).toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'});
+  document.getElementById('modalMeta').innerHTML =
+    `<span class="news-date">${date}</span>
+     <span class="news-author">${escHtml(a.author)}</span>
+     ${isNew(a)?'<span class="news-new-badge">● NEW</span>':''}
+     <span style="margin-left:auto;font-family:var(--mono);font-size:10px;color:var(--text3)">${readTime(a.body)}</span>`;
+  document.getElementById('modalTitle').textContent = a.title;
+  document.getElementById('modalBody').innerHTML = a.body;
+
+  // Scroll modal to top
+  document.getElementById('modalBox').scrollTop = 0;
+
+  // Show
   document.getElementById('newsModal').classList.remove('hidden');
-  document.body.style.overflow = 'hidden';
+
+  // Lock body: fixed + preserve scroll offset
+  document.body.style.position = 'fixed';
+  document.body.style.top = `-${savedScrollY}px`;
+  document.body.style.width = '100%';
+  document.body.style.overflowY = 'scroll'; // keeps scrollbar width stable
 }
 
-function closeModal(e) {
-  if (e.target === document.getElementById('newsModal')) {
-    document.getElementById('newsModal').classList.add('hidden');
-    document.body.style.overflow = '';
-  }
+// ── MODAL CLOSE — restore scroll ─────────────────────────────────────
+function closeModal() {
+  document.getElementById('newsModal').classList.add('hidden');
+  // Restore body
+  document.body.style.position = '';
+  document.body.style.top = '';
+  document.body.style.width = '';
+  document.body.style.overflowY = '';
+  // Jump back to exact position
+  window.scrollTo({ top: savedScrollY, behavior: 'instant' });
 }
-document.addEventListener('keydown', e => {
-  if (e.key === 'Escape') { document.getElementById('newsModal').classList.add('hidden'); document.body.style.overflow = ''; }
+
+// Backdrop click → close
+document.getElementById('newsModal').addEventListener('click', e => {
+  if (e.target === document.getElementById('newsModal')) closeModal();
 });
+// Close button
+document.getElementById('modalCloseBtn').addEventListener('click', closeModal);
+// Escape key
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
 
+// Sidebar
 function renderSidebar() {
-  const total = allNews.length;
-  const weekAgo = new Date(Date.now() - 7*24*60*60*1000);
-  const today = new Date(); today.setHours(0,0,0,0);
-  const week = allNews.filter(n => new Date(n.posted_at) > weekAgo).length;
-  const todayCount = allNews.filter(n => new Date(n.posted_at) >= today).length;
-  document.getElementById('sTotal').textContent = total;
-  document.getElementById('sWeek').textContent = week;
-  document.getElementById('sToday').textContent = todayCount;
-  // Trending = latest 5
-  const trending = allNews.slice(0, 5);
-  document.getElementById('trendingList').innerHTML = trending.map((n,i) => `
+  const wa = new Date(Date.now()-7*24*60*60*1000);
+  const tod = new Date(); tod.setHours(0,0,0,0);
+  document.getElementById('sTotal').textContent = allNews.length;
+  document.getElementById('sWeek').textContent  = allNews.filter(n=>new Date(n.posted_at)>wa).length;
+  document.getElementById('sToday').textContent = allNews.filter(n=>new Date(n.posted_at)>=tod).length;
+  document.getElementById('trendingList').innerHTML = allNews.slice(0,5).map((n,i)=>`
     <div class="trend-item" onclick="openModal('${n.id}')">
       <span class="trend-num">0${i+1}</span>
-      <div><div class="trend-title">${escHtml(n.title)}</div><div class="trend-date">${new Date(n.posted_at).toLocaleDateString('en-GB',{day:'numeric',month:'short'})}</div></div>
+      <div><div class="trend-title">${escHtml(n.title)}</div>
+      <div class="trend-date">${new Date(n.posted_at).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'})}</div></div>
     </div>`).join('');
 }
 
+// Ticker
 function buildTicker() {
-  const items = allNews.slice(0,10).map(n => `<span class="ticker-item"><span class="ticker-sep">●</span> ${escHtml(n.title)}</span>`).join('');
-  const inner = document.getElementById('tickerInner');
-  inner.innerHTML = items + items; // duplicate for seamless loop
+  const items = allNews.slice(0,12).map(n=>`<span class="ticker-item"><span class="ticker-sep">●</span> ${escHtml(n.title)}</span>`).join('');
+  const el = document.getElementById('tickerInner');
+  el.innerHTML = items + items;
 }
 
-function stripHtml(html) { return html.replace(/<[^>]+>/g,' ').replace(/\s+/g,' ').trim(); }
-function escHtml(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function stripHtml(html){return html.replace(/<[^>]+>/g,' ').replace(/\s+/g,' ').trim();}
+function escHtml(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 
 loadNews();
-// Realtime subscription for new articles
-SB.channel('news-changes').on('postgres_changes',{event:'INSERT',schema:'public',table:'news'},() => loadNews()).subscribe();
+SB.channel('news-rt').on('postgres_changes',{event:'INSERT',schema:'public',table:'news'},()=>loadNews()).subscribe();
 </script>
 </body>
 </html>
