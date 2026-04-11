@@ -6,7 +6,6 @@
   <title>Threat Intelligence — Cybthreat</title>
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Syne:wght@400;600;700;800;900&display=swap" rel="stylesheet"/>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
-  <script src="../config.js"></script>
   <style>
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
     :root{
@@ -16,8 +15,8 @@
       --text:#e8eaf0;--text2:#8b93a8;--text3:#555d72;
       --accent:#00e5a0;--accent2:#00ffb3;--accent-dim:rgba(0,229,160,0.1);
       --red:#ff4d4d;--red-bg:rgba(255,77,77,0.1);
-      --amber:#ffb547;
-      --blue:#4d9eff;
+      --amber:#ffb547;--amber-bg:rgba(255,181,71,0.1);
+      --blue:#4d9eff;--blue-bg:rgba(77,158,255,0.1);
       --font:'Syne',sans-serif;--mono:'JetBrains Mono',monospace;
       --r:10px;--rl:14px;
     }
@@ -25,21 +24,65 @@
     body{background:var(--bg);color:var(--text);font-family:var(--font);line-height:1.6;min-height:100vh;overflow-x:hidden}
     .scanline{position:fixed;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.022) 2px,rgba(0,0,0,0.022) 4px);pointer-events:none;z-index:999}
 
+    /* ── COPY TOAST ── */
+    #copyToast{
+      position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(80px);
+      z-index:9999;
+      background:rgba(22,27,36,0.96);
+      border:1px solid rgba(0,229,160,0.35);
+      color:var(--accent);
+      font-family:var(--mono);font-size:12px;font-weight:600;
+      padding:10px 22px;border-radius:40px;
+      display:flex;align-items:center;gap:8px;
+      backdrop-filter:blur(12px);
+      box-shadow:0 8px 32px rgba(0,0,0,0.5);
+      transition:transform 0.35s cubic-bezier(0.34,1.56,0.64,1);
+      pointer-events:none;
+    }
+    #copyToast.show{transform:translateX(-50%) translateY(0);}
+
+    /* ── SHARE MENU ── */
+    .share-menu{
+      position:absolute;bottom:calc(100% + 8px);right:0;
+      background:var(--surface2);
+      border:1px solid var(--border2);
+      border-radius:var(--r);
+      padding:6px;
+      min-width:180px;
+      z-index:100;
+      box-shadow:0 12px 40px rgba(0,0,0,0.5);
+      opacity:0;transform:translateY(6px) scale(0.97);
+      pointer-events:none;
+      transition:opacity 0.18s ease,transform 0.18s ease;
+    }
+    .share-menu.open{opacity:1;transform:translateY(0) scale(1);pointer-events:all;}
+    .share-menu-item{
+      display:flex;align-items:center;gap:9px;
+      padding:8px 12px;border-radius:6px;
+      font-family:var(--mono);font-size:11px;color:var(--text2);
+      cursor:pointer;transition:all .15s;border:none;background:none;width:100%;text-align:left;
+    }
+    .share-menu-item:hover{background:rgba(255,255,255,0.05);color:var(--text);}
+    .share-menu-item svg{flex-shrink:0;color:var(--text3);}
+    .share-menu-sep{height:1px;background:var(--border);margin:4px 0;}
+
     /* NAV */
     .nav{position:sticky;top:0;z-index:200;background:rgba(10,12,16,.95);backdrop-filter:blur(16px);border-bottom:1px solid var(--border)}
     .nav-inner{max-width:1200px;margin:0 auto;padding:0 24px;height:60px;display:flex;align-items:center;justify-content:space-between;gap:16px}
     .logo{display:flex;align-items:center;gap:9px;font-weight:900;font-size:18px;letter-spacing:-.03em;color:var(--text);text-decoration:none}
     .logo-icon{color:var(--accent);display:flex}
+    .nav-right{display:flex;align-items:center;gap:10px}
     .nav-back{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:600;color:var(--text2);padding:6px 14px;border-radius:7px;border:1px solid var(--border2);transition:all .2s;text-decoration:none;white-space:nowrap}
     .nav-back:hover{color:var(--accent);border-color:rgba(0,229,160,.3);background:var(--accent-dim)}
+    .nav-live{display:flex;align-items:center;gap:6px;font-family:var(--mono);font-size:10px;color:var(--red);background:var(--red-bg);border:1px solid rgba(255,77,77,.2);padding:5px 12px;border-radius:20px;letter-spacing:.07em}
+    .nav-live-dot{width:5px;height:5px;background:var(--red);border-radius:50%;animation:blink 1s infinite;flex-shrink:0}
+    @keyframes blink{0%,100%{opacity:1}50%{opacity:.15}}
 
     /* HERO */
     .hero{padding:52px 24px 40px;position:relative;overflow:hidden;background:linear-gradient(180deg,var(--bg) 0%,var(--bg2) 100%)}
     .hero::before{content:'';position:absolute;inset:0;background-image:linear-gradient(var(--border) 1px,transparent 1px),linear-gradient(90deg,var(--border) 1px,transparent 1px);background-size:44px 44px;mask-image:radial-gradient(ellipse 80% 80% at 50% 50%,black 0%,transparent 80%)}
     .hero-inner{position:relative;z-index:1;max-width:1200px;margin:0 auto;display:flex;align-items:flex-end;justify-content:space-between;gap:24px;flex-wrap:wrap}
     .hero-tag{display:inline-flex;align-items:center;gap:7px;font-family:var(--mono);font-size:10px;color:var(--red);background:var(--red-bg);border:1px solid rgba(255,77,77,.2);padding:4px 12px;border-radius:20px;margin-bottom:14px;letter-spacing:.05em}
-    .blink{width:5px;height:5px;background:var(--red);border-radius:50%;animation:blink 1s infinite;flex-shrink:0}
-    @keyframes blink{0%,100%{opacity:1}50%{opacity:.15}}
     .hero-h1{font-size:clamp(28px,4.5vw,48px);font-weight:900;letter-spacing:-.04em;margin-bottom:10px}
     .hero-h1 span{color:var(--accent)}
     .hero-sub{font-size:14px;color:var(--text2);max-width:500px;line-height:1.7}
@@ -59,80 +102,203 @@
     .page-wrap{max-width:1200px;margin:0 auto;padding:32px 24px 80px;display:grid;grid-template-columns:1fr 300px;gap:32px;align-items:start}
 
     /* FEED */
-    .feed-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:10px}
-    .feed-title{font-size:12px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.1em}
-    .search-wrap{position:relative}
-    .search-wrap svg{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--text3);pointer-events:none}
-    .search-input{background:var(--surface);border:1px solid var(--border2);border-radius:var(--r);padding:8px 12px 8px 32px;font-family:var(--mono);font-size:12px;color:var(--text);outline:none;width:220px;transition:border-color .2s}
+    .feed-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px}
+    .feed-title{font-size:12px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.1em;display:flex;align-items:center;gap:8px}
+    .feed-count{font-family:var(--mono);font-size:11px;color:var(--text3);background:var(--surface);border:1px solid var(--border);padding:2px 9px;border-radius:10px}
+    .search-wrap{position:relative;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+    .search-input-wrap{position:relative}
+    .search-input-wrap svg{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--text3);pointer-events:none}
+    .search-input{background:var(--surface);border:1px solid var(--border2);border-radius:var(--r);padding:8px 12px 8px 32px;font-family:var(--mono);font-size:12px;color:var(--text);outline:none;width:200px;transition:border-color .2s}
     .search-input::placeholder{color:var(--text3)}
     .search-input:focus{border-color:rgba(0,229,160,.4)}
+
     .news-feed{display:flex;flex-direction:column;gap:0}
 
-    /* NEWS CARD */
-    .news-card{background:var(--surface);border:1px solid var(--border2);border-radius:var(--rl);overflow:hidden;transition:border-color .25s,transform .25s,box-shadow .25s;cursor:pointer;margin-bottom:22px}
-    .news-card:hover{border-color:rgba(0,229,160,.35);transform:translateY(-3px);box-shadow:0 16px 48px rgba(0,0,0,.35)}
+    /* ── NEWS CARD ── */
+    .news-card{
+      background:var(--surface);
+      border:1px solid var(--border2);
+      border-radius:var(--rl);
+      overflow:visible;
+      transition:border-color .25s,transform .25s,box-shadow .25s;
+      margin-bottom:24px;
+      position:relative;
+    }
+    .news-card:hover{border-color:rgba(0,229,160,.3);transform:translateY(-2px);box-shadow:0 16px 56px rgba(0,0,0,.3)}
     .news-card:last-child{margin-bottom:0}
 
-    /* BIG image */
-    .card-img-wrap{overflow:hidden;width:100%}
-    .news-card-img{width:100%;height:280px;object-fit:cover;display:block;transition:transform .45s ease}
-    .news-card:hover .news-card-img{transform:scale(1.03)}
-    .news-card-img-placeholder{width:100%;height:220px;background:linear-gradient(135deg,var(--bg3) 0%,var(--surface2) 100%);display:flex;align-items:center;justify-content:center;color:var(--text3)}
-    .news-card.featured .news-card-img{height:360px}
-    .news-card.featured .news-card-img-placeholder{height:280px}
+    /* Featured accent line */
+    .news-card.featured::before{
+      content:'';position:absolute;top:0;left:0;right:0;height:2px;
+      background:linear-gradient(90deg,var(--accent),transparent 70%);
+      border-radius:var(--rl) var(--rl) 0 0;z-index:1;
+    }
 
-    .news-card-body{padding:22px 24px 24px}
-    .news-card-meta{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:10px}
+    /* Image */
+    .card-img-wrap{overflow:hidden;border-radius:var(--rl) var(--rl) 0 0}
+    .news-card-img{width:100%;height:260px;object-fit:cover;display:block;transition:transform .5s ease}
+    .news-card:hover .news-card-img{transform:scale(1.025)}
+    .news-card.featured .news-card-img{height:340px}
+    .news-card-img-placeholder{
+      width:100%;height:220px;
+      background:linear-gradient(135deg,var(--bg3) 0%,var(--surface2) 100%);
+      display:flex;align-items:center;justify-content:center;color:var(--text3);
+      border-radius:var(--rl) var(--rl) 0 0;
+    }
+    .news-card.featured .news-card-img-placeholder{height:280px;}
+
+    /* Card body */
+    .news-card-body{padding:22px 24px 20px}
+
+    /* Category / meta row */
+    .news-card-meta{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:12px}
     .news-date{font-family:var(--mono);font-size:10px;color:var(--text3)}
-    .news-author{font-family:var(--mono);font-size:10px;color:var(--accent);background:var(--accent-dim);padding:2px 8px;border-radius:4px;border:1px solid rgba(0,229,160,.15)}
-    .news-new-badge{font-family:var(--mono);font-size:9px;font-weight:700;color:var(--red);background:var(--red-bg);border:1px solid rgba(255,77,77,.25);padding:2px 8px;border-radius:10px;letter-spacing:.07em;animation:popIn .3s ease}
+    .news-author-chip{
+      display:inline-flex;align-items:center;gap:5px;
+      font-family:var(--mono);font-size:10px;color:var(--accent);
+      background:var(--accent-dim);padding:2px 9px;border-radius:4px;
+      border:1px solid rgba(0,229,160,.15);font-weight:600;
+    }
+    .news-new-badge{
+      font-family:var(--mono);font-size:9px;font-weight:700;
+      color:var(--red);background:var(--red-bg);
+      border:1px solid rgba(255,77,77,.25);
+      padding:2px 8px;border-radius:10px;letter-spacing:.07em;
+      animation:popIn .3s ease;
+    }
     @keyframes popIn{from{transform:scale(.8);opacity:0}to{transform:scale(1);opacity:1}}
-    .news-title{font-size:19px;font-weight:800;letter-spacing:-.03em;line-height:1.3;margin-bottom:10px;color:var(--text)}
-    .news-card.featured .news-title{font-size:22px}
-    .news-excerpt{font-size:13px;color:var(--text2);line-height:1.7;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;margin-bottom:16px}
-    .news-card.featured .news-excerpt{-webkit-line-clamp:4}
-    .news-footer{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
-    .news-read-more{display:inline-flex;align-items:center;gap:6px;font-family:var(--mono);font-size:11px;color:var(--accent);background:var(--accent-dim);padding:6px 14px;border-radius:20px;border:1px solid rgba(0,229,160,.2);transition:all .2s}
-    .news-read-more:hover{background:rgba(0,229,160,.18)}
-    .news-read-time{font-family:var(--mono);font-size:10px;color:var(--text3)}
+    .news-read-time{font-family:var(--mono);font-size:10px;color:var(--text3);margin-left:auto}
 
-    /* MODAL */
+    .news-title{
+      font-size:18px;font-weight:800;letter-spacing:-.02em;line-height:1.3;
+      margin-bottom:10px;color:var(--text);cursor:pointer;transition:color .2s;
+    }
+    .news-title:hover{color:var(--accent)}
+    .news-card.featured .news-title{font-size:22px}
+
+    .news-excerpt{
+      font-size:13px;color:var(--text2);line-height:1.7;
+      display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;
+      margin-bottom:18px;
+    }
+    .news-card.featured .news-excerpt{-webkit-line-clamp:4}
+
+    /* Card footer with actions */
+    .news-card-footer{
+      display:flex;align-items:center;justify-content:space-between;
+      padding:14px 24px;
+      border-top:1px solid var(--border);
+      background:rgba(255,255,255,0.01);
+      border-radius:0 0 var(--rl) var(--rl);
+    }
+    .footer-left{display:flex;align-items:center;gap:8px}
+    .footer-right{display:flex;align-items:center;gap:6px;position:relative}
+
+    /* Read more btn */
+    .btn-read{
+      display:inline-flex;align-items:center;gap:6px;
+      font-family:var(--font);font-size:12px;font-weight:700;
+      color:#001a0e;background:var(--accent);
+      padding:7px 16px;border-radius:7px;border:none;cursor:pointer;
+      transition:background .2s,transform .1s;
+    }
+    .btn-read:hover{background:var(--accent2);transform:translateY(-1px)}
+    .btn-read:active{transform:scale(.98)}
+
+    /* Share btn */
+    .btn-share{
+      display:inline-flex;align-items:center;gap:5px;
+      font-family:var(--mono);font-size:11px;font-weight:600;
+      color:var(--text2);background:transparent;
+      padding:7px 12px;border-radius:7px;border:1px solid var(--border2);
+      cursor:pointer;transition:all .2s;
+    }
+    .btn-share:hover{color:var(--text);background:var(--surface2);border-color:var(--border2)}
+
+    /* Copy link btn */
+    .btn-copy-link{
+      display:inline-flex;align-items:center;gap:5px;
+      font-family:var(--mono);font-size:11px;font-weight:600;
+      color:var(--text2);background:transparent;
+      padding:7px 10px;border-radius:7px;border:1px solid var(--border2);
+      cursor:pointer;transition:all .2s;
+    }
+    .btn-copy-link:hover{color:var(--accent);border-color:rgba(0,229,160,.3);background:var(--accent-dim)}
+
+    /* ── MODAL ── */
     .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.82);z-index:500;display:flex;align-items:center;justify-content:center;padding:16px;backdrop-filter:blur(6px);animation:fadeIn .2s ease}
     @keyframes fadeIn{from{opacity:0}to{opacity:1}}
     .modal-overlay.hidden{display:none!important}
-    .modal{background:var(--surface);border:1px solid var(--border2);border-radius:16px;max-width:760px;width:100%;max-height:88vh;overflow-y:auto;overflow-x:hidden;animation:slideUp .25s ease;position:relative}
+    .modal{background:var(--surface);border:1px solid var(--border2);border-radius:16px;max-width:780px;width:100%;max-height:90vh;overflow-y:auto;overflow-x:hidden;animation:slideUp .25s ease;position:relative}
     @keyframes slideUp{from{transform:translateY(24px);opacity:0}to{transform:translateY(0);opacity:1}}
 
-    /* sticky close bar */
-    .modal-close-bar{position:sticky;top:0;z-index:20;background:rgba(22,27,36,.96);backdrop-filter:blur(10px);border-bottom:1px solid var(--border);padding:10px 18px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+    .modal-close-bar{
+      position:sticky;top:0;z-index:20;
+      background:rgba(22,27,36,.96);backdrop-filter:blur(10px);
+      border-bottom:1px solid var(--border);
+      padding:10px 18px;
+      display:flex;align-items:center;justify-content:space-between;gap:12px;
+    }
+    .modal-close-left{display:flex;align-items:center;gap:10px}
     .modal-close-label{font-family:var(--mono);font-size:10px;color:var(--text3);letter-spacing:.08em}
-    .modal-close-btn{background:var(--surface2);border:1px solid var(--border2);color:var(--text2);width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:14px;line-height:1;transition:all .2s;flex-shrink:0}
+    .modal-share-bar{display:flex;align-items:center;gap:6px}
+    .modal-share-btn{
+      display:inline-flex;align-items:center;gap:5px;
+      font-family:var(--mono);font-size:10px;font-weight:600;
+      color:var(--text2);background:transparent;
+      padding:5px 10px;border-radius:6px;border:1px solid var(--border2);
+      cursor:pointer;transition:all .15s;
+    }
+    .modal-share-btn:hover{color:var(--accent);border-color:rgba(0,229,160,.3);background:var(--accent-dim)}
+    .modal-close-btn{
+      background:var(--surface2);border:1px solid var(--border2);color:var(--text2);
+      width:30px;height:30px;border-radius:50%;
+      display:flex;align-items:center;justify-content:center;
+      cursor:pointer;font-size:14px;line-height:1;transition:all .2s;flex-shrink:0;
+    }
     .modal-close-btn:hover{color:var(--text);background:var(--red-bg);border-color:rgba(255,77,77,.3)}
 
     .modal-img-wrap{overflow:hidden;width:100%}
     .modal-img{width:100%;max-height:420px;object-fit:cover;display:block}
     .modal-body{padding:28px 32px 36px}
     .modal-meta{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:16px}
-    .modal-title{font-size:clamp(20px,3vw,30px);font-weight:900;letter-spacing:-.03em;margin-bottom:20px;line-height:1.2;color:var(--text)}
+    .modal-title{font-size:clamp(20px,3vw,28px);font-weight:900;letter-spacing:-.03em;margin-bottom:20px;line-height:1.2;color:var(--text)}
     .modal-divider{height:1px;background:var(--border);margin-bottom:24px}
     .modal-content{font-size:15px;color:var(--text2);line-height:1.85}
-    .modal-content h1{font-size:22px;font-weight:800;color:var(--text);margin:28px 0 12px;letter-spacing:-.02em}
-    .modal-content h2{font-size:19px;font-weight:700;color:var(--text);margin:24px 0 10px}
-    .modal-content h3{font-size:16px;font-weight:700;color:var(--text);margin:20px 0 8px}
+    .modal-content h1,.modal-content h2,.modal-content h3{color:var(--text);font-weight:700;margin:24px 0 10px}
+    .modal-content h1{font-size:22px} .modal-content h2{font-size:19px} .modal-content h3{font-size:16px}
     .modal-content p{margin-bottom:16px}
     .modal-content strong,.modal-content b{color:var(--text);font-weight:700}
-    .modal-content em,.modal-content i{font-style:italic}
-    .modal-content u{text-decoration:underline}
     .modal-content ul,.modal-content ol{padding-left:22px;margin-bottom:16px}
     .modal-content li{margin-bottom:6px}
     .modal-content a{color:var(--accent);text-decoration:underline;word-break:break-word}
-    .modal-content a:hover{color:var(--accent2)}
     .modal-content blockquote{border-left:3px solid var(--accent);padding:10px 16px;margin:20px 0;background:var(--accent-dim);border-radius:0 8px 8px 0;color:var(--text2)}
     .modal-content img{max-width:100%;border-radius:10px;margin:16px 0;display:block}
     .modal-content code{font-family:var(--mono);background:var(--bg3);padding:2px 7px;border-radius:4px;font-size:13px;color:var(--accent)}
     .modal-content pre{background:var(--bg3);padding:16px;border-radius:var(--r);overflow-x:auto;margin:16px 0}
     .modal-content pre code{background:none;padding:0;font-size:12px}
     .modal-content hr{border:none;border-top:1px solid var(--border);margin:24px 0}
+
+    /* Modal footer */
+    .modal-footer{
+      border-top:1px solid var(--border);
+      padding:16px 32px;
+      display:flex;align-items:center;justify-content:space-between;
+      gap:12px;flex-wrap:wrap;
+      background:rgba(255,255,255,0.01);
+    }
+    .modal-footer-share{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+    .modal-footer-label{font-family:var(--mono);font-size:10px;color:var(--text3);letter-spacing:.07em}
+    .share-platform-btn{
+      display:inline-flex;align-items:center;gap:5px;
+      font-family:var(--mono);font-size:10px;font-weight:600;
+      padding:6px 12px;border-radius:6px;border:1px solid var(--border2);
+      cursor:pointer;background:transparent;color:var(--text2);transition:all .15s;
+    }
+    .share-platform-btn:hover{transform:translateY(-1px);}
+    .share-twitter:hover{color:#1d9bf0;border-color:rgba(29,155,240,.3);background:rgba(29,155,240,.08)}
+    .share-linkedin:hover{color:#0077b5;border-color:rgba(0,119,181,.3);background:rgba(0,119,181,.08)}
+    .share-copy:hover{color:var(--accent);border-color:rgba(0,229,160,.3);background:var(--accent-dim)}
 
     /* SIDEBAR */
     .sidebar{display:flex;flex-direction:column;gap:16px;position:sticky;top:80px}
@@ -151,7 +317,11 @@
 
     /* LOAD MORE */
     .load-more-wrap{display:flex;justify-content:center;margin-top:4px}
-    .btn-load-more{background:var(--surface);border:1px solid var(--border2);color:var(--text2);font-family:var(--mono);font-size:12px;padding:10px 28px;border-radius:var(--r);cursor:pointer;transition:all .2s}
+    .btn-load-more{
+      background:var(--surface);border:1px solid var(--border2);
+      color:var(--text2);font-family:var(--mono);font-size:12px;
+      padding:10px 28px;border-radius:var(--r);cursor:pointer;transition:all .2s;
+    }
     .btn-load-more:hover{border-color:rgba(0,229,160,.3);color:var(--accent);background:var(--accent-dim)}
 
     /* EMPTY / LOADING */
@@ -166,23 +336,22 @@
       .page-wrap{padding:20px 16px 60px}
       .hero{padding:40px 16px 32px}
       .nav-inner{padding:0 16px}
-      .news-card-img{height:220px}
-      .news-card.featured .news-card-img{height:260px}
-      .news-card-body{padding:16px 18px 20px}
-      .news-title{font-size:17px}
-      .news-card.featured .news-title{font-size:19px}
-      .search-input{width:150px}
+      .news-card-img{height:200px}
+      .news-card.featured .news-card-img{height:240px}
+      .news-card-body{padding:16px 18px 16px}
+      .news-card-footer{padding:12px 18px}
+      .news-title{font-size:16px}
+      .news-card.featured .news-title{font-size:18px}
+      .search-input{width:140px}
       .modal-body{padding:20px 20px 28px}
-      .modal-img{max-height:260px}
+      .modal-img{max-height:240px}
+      .modal-footer{padding:14px 20px}
       .live-clock{display:none}
     }
     @media(max-width:480px){
-      .news-card-img{height:180px}
-      .news-card.featured .news-card-img{height:220px}
+      .news-card-img,.news-card.featured .news-card-img{height:180px}
       .search-input{width:120px;font-size:11px}
-      .modal-body{padding:16px 16px 24px}
     }
-
     ::-webkit-scrollbar{width:5px;height:5px}
     ::-webkit-scrollbar-track{background:var(--bg2)}
     ::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
@@ -190,6 +359,12 @@
 </head>
 <body>
 <div class="scanline"></div>
+
+<!-- COPY TOAST -->
+<div id="copyToast">
+  <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M13 5L6 12l-3-3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  Link copied to clipboard!
+</div>
 
 <!-- NAV -->
 <nav class="nav">
@@ -203,10 +378,13 @@
       </span>
       Cybthreat
     </a>
-    <a href="../index.html" class="nav-back">
-      <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M10 3L5 8l5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      Back to Home
-    </a>
+    <div class="nav-right">
+      <div class="nav-live"><span class="nav-live-dot"></span>LIVE FEED</div>
+      <a href="../index.html" class="nav-back">
+        <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M10 3L5 8l5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Back to Home
+      </a>
+    </div>
   </div>
 </nav>
 
@@ -216,7 +394,7 @@
     <div>
       <div class="hero-tag"><span class="blink"></span>LIVE INTEL FEED</div>
       <h1 class="hero-h1">Threat <span>Intelligence</span></h1>
-      <p class="hero-sub">Breaking cybersecurity news, vulnerability alerts, and threat intelligence — curated by the Cybthreat research team.</p>
+      <p class="hero-sub">Breaking cybersecurity news, vulnerability alerts, and threat intelligence — curated and published by the Cybthreat research team.</p>
     </div>
     <div class="live-clock">
       <span class="utc" id="clockUtc">--:--:--</span>
@@ -228,7 +406,7 @@
 <!-- TICKER -->
 <div class="ticker-bar">
   <div class="ticker-inner" id="tickerInner">
-    <span class="ticker-item"><span class="ticker-sep">●</span> Loading latest intelligence…</span>
+    <span class="ticker-item"><span class="ticker-sep">●</span>Loading latest intelligence…</span>
   </div>
 </div>
 
@@ -236,8 +414,11 @@
 <div class="modal-overlay hidden" id="newsModal">
   <div class="modal" id="modalBox">
     <div class="modal-close-bar">
-      <span class="modal-close-label">CYBTHREAT INTEL</span>
-      <button class="modal-close-btn" id="modalCloseBtn" aria-label="Close article">✕</button>
+      <div class="modal-close-left">
+        <span class="modal-close-label">CYBTHREAT INTEL</span>
+        <div class="modal-share-bar" id="modalShareBar"></div>
+      </div>
+      <button class="modal-close-btn" id="modalCloseBtn" aria-label="Close">✕</button>
     </div>
     <div class="modal-img-wrap">
       <img id="modalImg" src="" alt="" class="modal-img" style="display:none"/>
@@ -248,6 +429,10 @@
       <div class="modal-divider"></div>
       <div class="modal-content" id="modalBody"></div>
     </div>
+    <div class="modal-footer">
+      <span class="modal-footer-label">SHARE THIS ARTICLE</span>
+      <div class="modal-footer-share" id="modalFooterShare"></div>
+    </div>
   </div>
 </div>
 
@@ -255,10 +440,15 @@
 <div class="page-wrap">
   <main>
     <div class="feed-header">
-      <div class="feed-title">Latest Intelligence</div>
+      <div class="feed-title">
+        Latest Intelligence
+        <span class="feed-count" id="feedCount">—</span>
+      </div>
       <div class="search-wrap">
-        <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><circle cx="7" cy="7" r="5" stroke="currentColor" stroke-width="1.3"/><path d="M10.5 10.5L14 14" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
-        <input class="search-input" id="newsSearch" type="text" placeholder="Search news…" oninput="renderNews()"/>
+        <div class="search-input-wrap">
+          <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><circle cx="7" cy="7" r="5" stroke="currentColor" stroke-width="1.3"/><path d="M10.5 10.5L14 14" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+          <input class="search-input" id="newsSearch" type="text" placeholder="Search articles…" oninput="renderNews()"/>
+        </div>
       </div>
     </div>
     <div id="feedLoading" class="empty"><div class="spinner"></div></div>
@@ -291,7 +481,8 @@ const SB = supabase.createClient('https://ylidxkzjoneekstobaka.supabase.co', 'sb
 let allNews = [];
 const PAGE_SIZE = 8;
 let shown = PAGE_SIZE;
-let savedScrollY = 0; // for scroll-lock fix
+let savedScrollY = 0;
+let currentArticle = null;
 
 // Clock
 function updateClock() {
@@ -299,7 +490,43 @@ function updateClock() {
 }
 updateClock(); setInterval(updateClock, 1000);
 
-// Load
+// ── SHARE UTILITIES ──────────────────────────────────────────────────
+function getArticleShareURL(article) {
+  // Build a shareable URL with article ID as hash/param
+  const base = window.location.href.split('?')[0].split('#')[0];
+  return `${base}?article=${article.id}`;
+}
+
+function shareToTwitter(article) {
+  const url = encodeURIComponent(getArticleShareURL(article));
+  const text = encodeURIComponent(`${article.title} — via @Cybthreat`);
+  window.open(`https://twitter.com/intent/tweet?text=${text}&url=${url}`, '_blank', 'width=550,height=450');
+}
+
+function shareToLinkedIn(article) {
+  const url = encodeURIComponent(getArticleShareURL(article));
+  window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${url}`, '_blank', 'width=600,height=500');
+}
+
+function copyArticleLink(article) {
+  const url = getArticleShareURL(article);
+  navigator.clipboard.writeText(url).then(() => showCopyToast());
+}
+
+function showCopyToast() {
+  const toast = document.getElementById('copyToast');
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 2500);
+}
+
+// Close share menus on outside click
+document.addEventListener('click', e => {
+  document.querySelectorAll('.share-menu.open').forEach(m => {
+    if (!m.parentElement.contains(e.target)) m.classList.remove('open');
+  });
+});
+
+// ── LOAD NEWS ────────────────────────────────────────────────────────
 async function loadNews() {
   const { data, error } = await SB.from('news').select('*').eq('is_published',true).order('posted_at',{ascending:false});
   if (error) { console.error(error); return; }
@@ -309,6 +536,14 @@ async function loadNews() {
   renderNews();
   renderSidebar();
   buildTicker();
+
+  // Check URL for direct article link
+  const params = new URLSearchParams(window.location.search);
+  const articleId = params.get('article');
+  if (articleId) {
+    const article = allNews.find(n => n.id === articleId);
+    if (article) setTimeout(() => openModal(article.id), 300);
+  }
 }
 
 function isNew(a) { return (Date.now() - new Date(a.posted_at)) < 24*60*60*1000; }
@@ -324,6 +559,7 @@ function renderNews() {
   const feed = document.getElementById('newsFeed');
   const empty = document.getElementById('feedEmpty');
   const btn = document.getElementById('loadMoreBtn');
+  document.getElementById('feedCount').textContent = filtered.length;
   if (!filtered.length) { feed.style.display='none'; empty.style.display='flex'; btn.style.display='none'; return; }
   empty.style.display = 'none'; feed.style.display = 'flex';
   feed.innerHTML = filtered.slice(0, shown).map((n,i) => newsCard(n, i===0)).join('');
@@ -336,38 +572,76 @@ function newsCard(a, featured) {
   const date = new Date(a.posted_at).toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'});
   const badge = isNew(a) ? '<span class="news-new-badge">● NEW</span>' : '';
   const rt = readTime(a.body);
-  const excerpt = stripHtml(a.body).slice(0, featured?220:160)+'…';
+  const excerpt = stripHtml(a.body).slice(0, featured?230:170)+'…';
   const imgHtml = a.image_url
-    ? `<div class="card-img-wrap"><img src="${a.image_url}" alt="${escHtml(a.title)}" class="news-card-img" loading="lazy"/></div>`
-    : `<div class="news-card-img-placeholder"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" opacity=".2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg></div>`;
+    ? `<div class="card-img-wrap"><img src="${escHtml(a.image_url)}" alt="${escHtml(a.title)}" class="news-card-img" loading="lazy" onclick="openModal('${a.id}')" style="cursor:pointer"/></div>`
+    : `<div class="news-card-img-placeholder" onclick="openModal('${a.id}')" style="cursor:pointer"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" opacity=".2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg></div>`;
+
   return `
-  <div class="news-card${featured?' featured':''}" onclick="openModal('${a.id}')">
+  <div class="news-card${featured?' featured':''}">
     ${imgHtml}
     <div class="news-card-body">
       <div class="news-card-meta">
         <span class="news-date">${date}</span>
-        <span class="news-author">${escHtml(a.author)}</span>
+        <span class="news-author-chip">${escHtml(a.author)}</span>
         ${badge}
-      </div>
-      <div class="news-title">${escHtml(a.title)}</div>
-      <div class="news-excerpt">${escHtml(excerpt)}</div>
-      <div class="news-footer">
-        <span class="news-read-more">Read full article <svg width="11" height="11" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></span>
         <span class="news-read-time">${rt}</span>
+      </div>
+      <div class="news-title" onclick="openModal('${a.id}')">${escHtml(a.title)}</div>
+      <div class="news-excerpt">${escHtml(excerpt)}</div>
+    </div>
+    <div class="news-card-footer">
+      <div class="footer-left">
+        <button class="btn-read" onclick="openModal('${a.id}')">
+          <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><rect x="1" y="2" width="14" height="12" rx="2" stroke="currentColor" stroke-width="1.3"/><path d="M4 6h8M4 9h5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+          Read Article
+        </button>
+      </div>
+      <div class="footer-right">
+        <button class="btn-copy-link" onclick="copyArticleLink(allNews.find(n=>n.id==='${a.id}'));event.stopPropagation()" title="Copy link">
+          <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M6 10l4-4M8.5 4.5L10 3a2.83 2.83 0 014 4l-1.5 1.5M7.5 11.5L6 13a2.83 2.83 0 01-4-4l1.5-1.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+          Copy Link
+        </button>
+        <div style="position:relative">
+          <button class="btn-share" onclick="toggleShareMenu('menu-${a.id}');event.stopPropagation()">
+            <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><circle cx="12" cy="3" r="1.5" stroke="currentColor" stroke-width="1.3"/><circle cx="12" cy="13" r="1.5" stroke="currentColor" stroke-width="1.3"/><circle cx="4" cy="8" r="1.5" stroke="currentColor" stroke-width="1.3"/><path d="M10.5 4l-5 3M10.5 12l-5-3" stroke="currentColor" stroke-width="1.3"/></svg>
+            Share
+          </button>
+          <div class="share-menu" id="menu-${a.id}">
+            <button class="share-menu-item" onclick="shareToTwitter(allNews.find(n=>n.id==='${a.id}'))">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+              Share on X (Twitter)
+            </button>
+            <button class="share-menu-item" onclick="shareToLinkedIn(allNews.find(n=>n.id==='${a.id}'))">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+              Share on LinkedIn
+            </button>
+            <div class="share-menu-sep"></div>
+            <button class="share-menu-item" onclick="copyArticleLink(allNews.find(n=>n.id==='${a.id}'))">
+              <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><rect x="5" y="5" width="9" height="9" rx="1.5" stroke="currentColor" stroke-width="1.2"/><path d="M11 5V3a1 1 0 00-1-1H3a1 1 0 00-1 1v7a1 1 0 001 1h2" stroke="currentColor" stroke-width="1.2"/></svg>
+              Copy Link
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   </div>`;
 }
 
-// ── MODAL OPEN — with scroll-lock fix ────────────────────────────────
+function toggleShareMenu(id) {
+  const menu = document.getElementById(id);
+  const wasOpen = menu.classList.contains('open');
+  document.querySelectorAll('.share-menu.open').forEach(m => m.classList.remove('open'));
+  if (!wasOpen) menu.classList.add('open');
+}
+
+// ── MODAL ────────────────────────────────────────────────────────────
 function openModal(id) {
   const a = allNews.find(n => n.id === id);
   if (!a) return;
-
-  // Save current scroll BEFORE locking
+  currentArticle = a;
   savedScrollY = window.scrollY;
 
-  // Populate modal
   const img = document.getElementById('modalImg');
   if (a.image_url) { img.src = a.image_url; img.style.display = 'block'; }
   else img.style.display = 'none';
@@ -375,45 +649,64 @@ function openModal(id) {
   const date = new Date(a.posted_at).toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'});
   document.getElementById('modalMeta').innerHTML =
     `<span class="news-date">${date}</span>
-     <span class="news-author">${escHtml(a.author)}</span>
+     <span class="news-author-chip">${escHtml(a.author)}</span>
      ${isNew(a)?'<span class="news-new-badge">● NEW</span>':''}
      <span style="margin-left:auto;font-family:var(--mono);font-size:10px;color:var(--text3)">${readTime(a.body)}</span>`;
   document.getElementById('modalTitle').textContent = a.title;
   document.getElementById('modalBody').innerHTML = a.body;
 
-  // Scroll modal to top
-  document.getElementById('modalBox').scrollTop = 0;
+  // Modal share bar (top)
+  document.getElementById('modalShareBar').innerHTML = `
+    <button class="modal-share-btn share-copy" onclick="copyArticleLink(currentArticle)" title="Copy link">
+      <svg width="11" height="11" viewBox="0 0 16 16" fill="none"><path d="M6 10l4-4M8.5 4.5L10 3a2.83 2.83 0 014 4l-1.5 1.5M7.5 11.5L6 13a2.83 2.83 0 01-4-4l1.5-1.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+      Copy Link
+    </button>`;
 
-  // Show
+  // Modal footer share buttons
+  document.getElementById('modalFooterShare').innerHTML = `
+    <button class="share-platform-btn share-twitter" onclick="shareToTwitter(currentArticle)">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+      X / Twitter
+    </button>
+    <button class="share-platform-btn share-linkedin" onclick="shareToLinkedIn(currentArticle)">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+      LinkedIn
+    </button>
+    <button class="share-platform-btn share-copy" onclick="copyArticleLink(currentArticle)">
+      <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><rect x="5" y="5" width="9" height="9" rx="1.5" stroke="currentColor" stroke-width="1.2"/><path d="M11 5V3a1 1 0 00-1-1H3a1 1 0 00-1 1v7a1 1 0 001 1h2" stroke="currentColor" stroke-width="1.2"/></svg>
+      Copy Link
+    </button>`;
+
+  document.getElementById('modalBox').scrollTop = 0;
   document.getElementById('newsModal').classList.remove('hidden');
 
-  // Lock body: fixed + preserve scroll offset
+  // Update URL without reload
+  history.pushState({articleId: id}, '', `?article=${id}`);
+
   document.body.style.position = 'fixed';
   document.body.style.top = `-${savedScrollY}px`;
   document.body.style.width = '100%';
-  document.body.style.overflowY = 'scroll'; // keeps scrollbar width stable
+  document.body.style.overflowY = 'scroll';
 }
 
-// ── MODAL CLOSE — restore scroll ─────────────────────────────────────
 function closeModal() {
   document.getElementById('newsModal').classList.add('hidden');
-  // Restore body
+  currentArticle = null;
   document.body.style.position = '';
   document.body.style.top = '';
   document.body.style.width = '';
   document.body.style.overflowY = '';
-  // Jump back to exact position
   window.scrollTo({ top: savedScrollY, behavior: 'instant' });
+  // Remove article param from URL
+  history.pushState({}, '', window.location.pathname);
 }
 
-// Backdrop click → close
 document.getElementById('newsModal').addEventListener('click', e => {
   if (e.target === document.getElementById('newsModal')) closeModal();
 });
-// Close button
 document.getElementById('modalCloseBtn').addEventListener('click', closeModal);
-// Escape key
 document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+window.addEventListener('popstate', () => closeModal());
 
 // Sidebar
 function renderSidebar() {

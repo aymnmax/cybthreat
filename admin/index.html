@@ -19,12 +19,31 @@
       --red:#ff4d4d;--red-bg:rgba(255,77,77,0.1);
       --amber:#ffb547;--amber-bg:rgba(255,181,71,0.1);
       --blue:#4d9eff;--blue-bg:rgba(77,158,255,0.1);
+      --purple:#a78bfa;--purple-bg:rgba(167,139,250,0.1);
       --font:'Syne',sans-serif;--mono:'JetBrains Mono',monospace;
       --r:8px;--rl:12px;
     }
     html{scroll-behavior:smooth}
     body{background:var(--bg);color:var(--text);font-family:var(--font);line-height:1.6;min-height:100vh;display:flex;flex-direction:column}
     input,textarea,select,button{font-family:inherit}
+
+    /* ── SUCCESS BANNER ── */
+    #successBanner{
+      position:fixed;top:20px;left:50%;transform:translateX(-50%) translateY(-120px);
+      z-index:9999;
+      background:rgba(62,207,142,0.12);
+      border:1px solid rgba(62,207,142,0.4);
+      color:#3ecf8e;
+      font-family:var(--mono);font-size:13px;font-weight:600;
+      padding:12px 28px;border-radius:40px;
+      display:flex;align-items:center;gap:10px;
+      backdrop-filter:blur(16px);
+      box-shadow:0 8px 32px rgba(0,0,0,0.4);
+      transition:transform 0.45s cubic-bezier(0.34,1.56,0.64,1);
+      white-space:nowrap;
+    }
+    #successBanner.show{transform:translateX(-50%) translateY(0);}
+    #successBanner svg{flex-shrink:0;}
 
     /* ── LOGIN SCREEN ── */
     #loginScreen{position:fixed;inset:0;background:var(--bg);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px}
@@ -37,12 +56,11 @@
 
     /* ── LAYOUT ── */
     .shell{display:flex;flex:1;min-height:100vh}
-    /* Sidebar */
     .sidebar{width:220px;background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;position:sticky;top:0;height:100vh;flex-shrink:0}
     .sb-logo{display:flex;align-items:center;gap:8px;padding:18px 16px;border-bottom:1px solid var(--border);font-weight:900;font-size:16px;letter-spacing:-.03em}
     .sb-logo svg{color:var(--accent)}
     .sb-badge{font-family:var(--mono);font-size:9px;background:var(--red-bg);color:var(--red);border:1px solid rgba(255,77,77,.2);padding:2px 7px;border-radius:4px;letter-spacing:.07em}
-    .sb-nav{flex:1;padding:12px 8px;display:flex;flex-direction:column;gap:2px}
+    .sb-nav{flex:1;padding:12px 8px;display:flex;flex-direction:column;gap:2px;overflow-y:auto}
     .sb-section{font-family:var(--mono);font-size:9px;color:var(--text3);letter-spacing:.1em;padding:8px 10px 4px;text-transform:uppercase}
     .sb-link{display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:var(--r);font-size:13px;font-weight:600;color:var(--text2);cursor:pointer;transition:all .2s;border:none;background:none;text-align:left;width:100%}
     .sb-link:hover{color:var(--text);background:var(--surface)}
@@ -55,12 +73,10 @@
     .sb-username{font-size:12px;font-weight:600;color:var(--text)}
     .sb-role{font-family:var(--mono);font-size:9px;color:var(--accent)}
 
-    /* Main area */
     .main{flex:1;overflow:auto;display:flex;flex-direction:column}
     .topbar{background:var(--bg2);border-bottom:1px solid var(--border);padding:0 28px;height:60px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-shrink:0}
     .topbar-title{font-size:16px;font-weight:800;letter-spacing:-.02em}
     .topbar-actions{display:flex;gap:8px}
-
     .content{padding:28px;flex:1}
 
     /* ── STATS ROW ── */
@@ -72,6 +88,18 @@
     .stat-amber{color:var(--amber)}
     .stat-red{color:var(--red)}
     .stat-blue{color:var(--blue)}
+
+    /* ── AUTHOR STATS CARD ── */
+    .author-stats-card{background:var(--surface);border:1px solid var(--border2);border-radius:var(--rl);padding:20px;margin-bottom:20px}
+    .author-stats-title{font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:16px;padding-bottom:10px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:7px}
+    .author-list{display:flex;flex-direction:column;gap:6px}
+    .author-row{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:var(--r);background:var(--bg3);border:1px solid var(--border)}
+    .author-rank{font-family:var(--mono);font-size:10px;color:var(--text3);width:18px;flex-shrink:0;text-align:center}
+    .author-avatar{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:10px;font-weight:700;flex-shrink:0}
+    .author-name{flex:1;font-size:13px;font-weight:600;color:var(--text)}
+    .author-bar-wrap{width:80px;height:4px;background:var(--border2);border-radius:2px;overflow:hidden;flex-shrink:0}
+    .author-bar{height:100%;border-radius:2px;background:var(--accent);transition:width .6s ease}
+    .author-count{font-family:var(--mono);font-size:11px;font-weight:700;color:var(--accent);flex-shrink:0;min-width:20px;text-align:right}
 
     /* ── SECTION VIEWS ── */
     .view{display:none}
@@ -160,6 +188,12 @@
   </style>
 </head>
 <body>
+
+<!-- SUCCESS BANNER -->
+<div id="successBanner">
+  <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="1.4"/><path d="M5 8l2 2 4-4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  <span id="successMsg">Action completed successfully!</span>
+</div>
 
 <div id="loginScreen">
   <div class="login-card">
@@ -267,6 +301,7 @@
 
     <div class="content">
 
+      <!-- DASHBOARD -->
       <div class="view active" id="view-dashboard">
         <div class="stats-row">
           <div class="stat-card"><div class="stat-num stat-accent" id="ds-jobs">—</div><div class="stat-lbl">Active Jobs</div></div>
@@ -274,6 +309,18 @@
           <div class="stat-card"><div class="stat-num stat-blue" id="ds-news">—</div><div class="stat-lbl">Articles Published</div></div>
           <div class="stat-card"><div class="stat-num stat-amber" id="ds-newsweek">—</div><div class="stat-lbl">Articles This Week</div></div>
         </div>
+
+        <!-- Author Stats -->
+        <div class="author-stats-card">
+          <div class="author-stats-title">
+            <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="6" r="3" stroke="currentColor" stroke-width="1.3"/><path d="M2 14c0-3 2.7-5 6-5s6 2 6 5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+            Published Articles by Author
+          </div>
+          <div class="author-list" id="authorList">
+            <div style="font-family:var(--mono);font-size:11px;color:var(--text3);padding:8px">Loading author stats…</div>
+          </div>
+        </div>
+
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
           <div>
             <div style="font-size:13px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.07em;margin-bottom:12px">Recent Jobs</div>
@@ -286,6 +333,7 @@
         </div>
       </div>
 
+      <!-- ADD/EDIT JOB -->
       <div class="view" id="view-addJob">
         <div class="form-card">
           <div class="form-title">
@@ -329,6 +377,7 @@
         </div>
       </div>
 
+      <!-- MANAGE JOBS -->
       <div class="view" id="view-manageJobs">
         <div class="table-wrap">
           <table>
@@ -336,11 +385,13 @@
             <tbody id="jobsTableBody"></tbody>
           </table>
         </div>
-        <div id="jobsTableLoading" class="empty" style="padding:40px;display:flex">
-          <div class="spinner"></div>
+        <div id="jobsTableLoading" style="padding:40px;display:flex;justify-content:center">
+          <div style="width:24px;height:24px;border:2px solid var(--border2);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite"></div>
         </div>
+        <style>@keyframes spin{to{transform:rotate(360deg)}}</style>
       </div>
 
+      <!-- ADD/EDIT NEWS -->
       <div class="view" id="view-addNews">
         <div class="form-card">
           <div class="form-title">
@@ -393,6 +444,7 @@
         </div>
       </div>
 
+      <!-- MANAGE NEWS -->
       <div class="view" id="view-manageNews">
         <div class="table-wrap">
           <table>
@@ -400,14 +452,26 @@
             <tbody id="newsTableBody"></tbody>
           </table>
         </div>
-        <div id="newsTableLoading" class="empty" style="padding:40px;display:flex">
-          <div class="spinner"></div>
+        <div id="newsTableLoading" style="padding:40px;display:flex;justify-content:center">
+          <div style="width:24px;height:24px;border:2px solid var(--border2);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite"></div>
         </div>
       </div>
 
-    </div></div></div><script>
+    </div>
+  </div>
+</div>
+
+<script>
 // ── SUPABASE ──────────────────────────────────────────────────────────
 const SB = supabase.createClient('https://ylidxkzjoneekstobaka.supabase.co', 'sb_publishable_4NuDJYNw0PBplKmaOyIFlw_eF4j2cc6');
+
+// ── SUCCESS BANNER ─────────────────────────────────────────────────────
+function showSuccess(msg) {
+  const banner = document.getElementById('successBanner');
+  document.getElementById('successMsg').textContent = msg;
+  banner.classList.add('show');
+  setTimeout(() => banner.classList.remove('show'), 3500);
+}
 
 // ── AUTH ──────────────────────────────────────────────────────────────
 async function doLogin() {
@@ -442,7 +506,6 @@ function showApp(user) {
   refreshAll();
 }
 
-// Check existing session on load
 SB.auth.getSession().then(({ data }) => {
   if (data.session) showApp(data.session.user);
 });
@@ -454,6 +517,12 @@ function showView(id, btn) {
   document.getElementById('view-'+id).classList.add('active');
   document.querySelectorAll('.sb-link').forEach(b => b.classList.remove('active'));
   if (btn) btn.classList.add('active');
+  else {
+    // Auto-highlight matching sidebar link
+    document.querySelectorAll('.sb-link').forEach(b => {
+      if (b.getAttribute('onclick') && b.getAttribute('onclick').includes("'"+id+"'")) b.classList.add('active');
+    });
+  }
   document.getElementById('topbarTitle').textContent = viewTitles[id] || id;
 }
 
@@ -481,10 +550,7 @@ function initQuill() {
 
 // ── IMAGE UPLOAD ──────────────────────────────────────────────────────
 let selectedImageFile = null;
-function handleImageSelect(e) {
-  const file = e.target.files[0];
-  if (file) previewImage(file);
-}
+function handleImageSelect(e) { const file = e.target.files[0]; if (file) previewImage(file); }
 function handleDrop(e) {
   e.preventDefault();
   document.getElementById('imgUploadArea').classList.remove('drag-over');
@@ -540,7 +606,7 @@ async function submitJob() {
   if (type === 'email' && !email) { showToast('jToast','Please provide an application email.','err'); return; }
 
   const btn = document.getElementById('jSubmitBtn');
-  btn.disabled = true; btn.textContent = id ? 'Updating…' : 'Posting…';
+  btn.disabled = true;
 
   const payload = { title, description: desc, apply_link: type==='link' ? link : null, apply_email: type==='email' ? email : null };
   
@@ -552,13 +618,17 @@ async function submitJob() {
   }
 
   btn.disabled = false;
-  btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="1.3"/><path d="M8 5v6M5 8h6" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg> ' + (id ? 'Update Job' : 'Post Job');
   
   if (result.error) { showToast('jToast','Error: '+result.error.message,'err'); return; }
-  showToast('jToast', id ? '✓ Job updated successfully!' : '✓ Job posted successfully!','ok');
+  
+  const isEdit = !!id;
   resetJobForm();
   refreshAll();
-  if (id) showView('manageJobs', document.querySelector('[onclick*=manageJobs]'));
+  
+  // Navigate to manage jobs with success banner
+  showView('manageJobs', null);
+  loadJobsTable();
+  setTimeout(() => showSuccess(isEdit ? '✓ Job listing updated successfully!' : '✓ New job posted successfully!'), 200);
 }
 
 function resetJobForm() {
@@ -578,7 +648,6 @@ async function editJob(id) {
   document.getElementById('editJobId').value = data.id;
   document.getElementById('jobFormModeTitle').textContent = 'Edit Job Listing';
   document.getElementById('jobBtnText').textContent = 'Update Job';
-  
   document.getElementById('jTitle').value = data.title;
   document.getElementById('jDesc').value = data.description;
   
@@ -612,7 +681,7 @@ async function submitNews() {
   let imageUrl = existingImg;
   if (selectedImageFile) {
     try { imageUrl = await uploadImage(selectedImageFile); }
-    catch(e) { showToast('nToast','Image upload failed: '+e.message,'err'); btn.disabled=false; btn.textContent='Publish Article'; return; }
+    catch(e) { showToast('nToast','Image upload failed: '+e.message,'err'); btn.disabled=false; btn.textContent=id?'Update Article':'Publish Article'; return; }
   }
 
   const payload = { title, author, body, image_url: imageUrl, is_published: pub };
@@ -625,13 +694,25 @@ async function submitNews() {
   }
 
   btn.disabled = false;
-  btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M14 2L9 14l-2-5-5-2 12-5z" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg> ' + (id ? 'Update Article' : 'Publish Article');
+
+  if (result.error) { showToast('nToast','Error: '+result.error.message,'err'); btn.textContent=id?'Update Article':'Publish Article'; return; }
   
-  if (result.error) { showToast('nToast','Error: '+result.error.message,'err'); return; }
-  showToast('nToast', id ? '✓ Article updated!' : '✓ Article published!','ok');
+  const isEdit = !!id;
+  const isDraft = !pub;
   resetNewsForm();
   refreshAll();
-  if (id) showView('manageNews', document.querySelector('[onclick*=manageNews]'));
+  
+  // Navigate to manage news with success banner
+  showView('manageNews', null);
+  loadNewsTable();
+  
+  let successMsg = isEdit
+    ? '✓ Article updated successfully!'
+    : isDraft
+      ? '✓ Article saved as draft!'
+      : '✓ Article published successfully!';
+  
+  setTimeout(() => showSuccess(successMsg), 200);
 }
 
 function resetNewsForm() {
@@ -641,6 +722,7 @@ function resetNewsForm() {
   document.getElementById('newsBtnText').textContent = 'Publish Article';
   document.getElementById('nTitle').value = '';
   document.getElementById('nAuthor').value = '';
+  document.getElementById('nPublished').value = 'true';
   if (quill) quill.setContents([]);
   removeImage();
 }
@@ -653,7 +735,6 @@ async function editNews(id) {
   document.getElementById('editNewsId').value = data.id;
   document.getElementById('newsFormModeTitle').textContent = 'Edit Article';
   document.getElementById('newsBtnText').textContent = 'Update Article';
-  
   document.getElementById('nTitle').value = data.title;
   document.getElementById('nAuthor').value = data.author;
   document.getElementById('nPublished').value = data.is_published.toString();
@@ -675,7 +756,10 @@ async function loadJobsTable() {
   document.getElementById('jobsTableBody').innerHTML = '';
   const { data } = await SB.from('jobs').select('*').order('posted_at',{ascending:false});
   document.getElementById('jobsTableLoading').style.display = 'none';
-  if (!data?.length) { document.getElementById('jobsTableBody').innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--text3);padding:24px;font-family:var(--mono);font-size:12px">No jobs yet</td></tr>'; return; }
+  if (!data?.length) {
+    document.getElementById('jobsTableBody').innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--text3);padding:24px;font-family:var(--mono);font-size:12px">No jobs yet</td></tr>';
+    return;
+  }
   document.getElementById('jobsTableBody').innerHTML = data.map(j => {
     const exp = new Date(j.expires_at) < new Date();
     const posted = new Date(j.posted_at).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});
@@ -702,7 +786,10 @@ async function loadNewsTable() {
   document.getElementById('newsTableBody').innerHTML = '';
   const { data } = await SB.from('news').select('*').order('posted_at',{ascending:false});
   document.getElementById('newsTableLoading').style.display = 'none';
-  if (!data?.length) { document.getElementById('newsTableBody').innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--text3);padding:24px;font-family:var(--mono);font-size:12px">No articles yet</td></tr>'; return; }
+  if (!data?.length) {
+    document.getElementById('newsTableBody').innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--text3);padding:24px;font-family:var(--mono);font-size:12px">No articles yet</td></tr>';
+    return;
+  }
   document.getElementById('newsTableBody').innerHTML = data.map(n => {
     const posted = new Date(n.posted_at).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});
     const status = n.is_published ? '<span class="pill pill-green">PUBLISHED</span>' : '<span class="pill pill-amber">DRAFT</span>';
@@ -723,9 +810,20 @@ async function loadNewsTable() {
 async function togglePublish(id, current) {
   await SB.from('news').update({ is_published: !current }).eq('id', id);
   loadNewsTable(); refreshAll();
+  showSuccess(current ? '✓ Article unpublished.' : '✓ Article is now live!');
 }
 
 // ── DASHBOARD ─────────────────────────────────────────────────────────
+// Colour palette for author avatars
+const AVATAR_COLORS = [
+  {bg:'rgba(0,229,160,0.15)',color:'#00e5a0'},
+  {bg:'rgba(77,158,255,0.15)',color:'#4d9eff'},
+  {bg:'rgba(255,181,71,0.15)',color:'#ffb547'},
+  {bg:'rgba(167,139,250,0.15)',color:'#a78bfa'},
+  {bg:'rgba(255,77,77,0.15)',color:'#ff4d4d'},
+  {bg:'rgba(62,207,142,0.15)',color:'#3ecf8e'},
+];
+
 async function loadDashboard() {
   const [{ data: jobs }, { data: news }] = await Promise.all([
     SB.from('jobs').select('*').order('posted_at',{ascending:false}),
@@ -745,6 +843,33 @@ async function loadDashboard() {
   document.getElementById('sbJobCount').textContent = active;
   document.getElementById('sbNewsCount').textContent = pubNews;
 
+  // ── Author stats ──
+  const authorCounts = {};
+  (news||[]).filter(n => n.is_published).forEach(n => {
+    const a = (n.author || 'Unknown').trim();
+    authorCounts[a] = (authorCounts[a] || 0) + 1;
+  });
+  const sorted = Object.entries(authorCounts).sort((a,b) => b[1]-a[1]);
+  const maxCount = sorted[0]?.[1] || 1;
+
+  if (sorted.length === 0) {
+    document.getElementById('authorList').innerHTML = '<div style="font-family:var(--mono);font-size:11px;color:var(--text3);padding:8px 0">No published articles yet.</div>';
+  } else {
+    document.getElementById('authorList').innerHTML = sorted.map(([author, count], i) => {
+      const initials = author.split(' ').map(w=>w[0]?.toUpperCase()||'').slice(0,2).join('');
+      const col = AVATAR_COLORS[i % AVATAR_COLORS.length];
+      const barPct = Math.round((count / maxCount) * 100);
+      return `
+      <div class="author-row">
+        <span class="author-rank">${i+1}</span>
+        <div class="author-avatar" style="background:${col.bg};color:${col.color}">${initials}</div>
+        <span class="author-name">${escHtml(author)}</span>
+        <div class="author-bar-wrap"><div class="author-bar" style="width:${barPct}%;background:${col.color}"></div></div>
+        <span class="author-count" style="color:${col.color}">${count}</span>
+      </div>`;
+    }).join('');
+  }
+
   document.getElementById('dbJobTable').innerHTML = (jobs||[]).slice(0,5).map(j => {
     const exp = new Date(j.expires_at) < now;
     return `<tr><td class="td-title" style="max-width:160px">${escHtml(j.title)}</td><td>${exp?'<span class="pill pill-red">EXPIRED</span>':'<span class="pill pill-green">ACTIVE</span>'}</td><td class="td-mono">${new Date(j.expires_at).toLocaleDateString('en-GB',{day:'numeric',month:'short'})}</td></tr>`;
@@ -758,11 +883,10 @@ async function loadDashboard() {
 function refreshAll() { loadDashboard(); }
 
 // ── DELETE CONFIRM ────────────────────────────────────────────────────
-let _delCb = null;
 function confirmDelete(table, id, cb) {
-  _delCb = async () => {
+  const okBtn = document.getElementById('confirmOkBtn');
+  okBtn.onclick = async () => {
     if (table === 'news') {
-      // also delete image from storage if exists
       const { data } = await SB.from('news').select('image_url').eq('id',id).single();
       if (data?.image_url) {
         const name = data.image_url.split('/').pop();
@@ -771,15 +895,15 @@ function confirmDelete(table, id, cb) {
     }
     await SB.from(table).delete().eq('id', id);
     closeConfirm(); cb(); refreshAll();
+    showSuccess('✓ Item deleted successfully.');
   };
   document.getElementById('confirmTitle').textContent = 'Delete this item?';
   document.getElementById('confirmSub').textContent = 'This cannot be undone. The item will be permanently removed.';
-  document.getElementById('confirmOkBtn').onclick = _delCb;
   document.getElementById('confirmOverlay').style.display = 'flex';
 }
 function closeConfirm() { document.getElementById('confirmOverlay').style.display = 'none'; }
 
-// ── TOAST ─────────────────────────────────────────────────────────────
+// ── TOAST (inline form errors) ────────────────────────────────────────
 function showToast(id, msg, type) {
   const el = document.getElementById(id);
   el.textContent = msg;
